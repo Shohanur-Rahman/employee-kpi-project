@@ -1,0 +1,39 @@
+﻿@page "/"
+
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+
+<PageTitle>Dashboard</PageTitle>
+
+<div class="container-fluid">
+    <div class="row page-title">
+        <div class="col-sm-6">
+            <h3>Your Dashboard</h3>
+        </div>
+    </div>
+</div>
+<div class="container-fluid default-dashboard">
+    <div class="row">
+        <div class="col-sm-6 col-xl-5 d-flex align-items-stretch">
+            <GrettingCard/>
+        </div>
+        <div class="col-sm-6 col-xl-3 d-flex align-items-stretch">
+           <ProjectOverviewCard/>
+        </div>
+        <div class="col-sm-6 col-xl-4 d-flex align-items-stretch">
+            <KPIIndicatorCard/>
+        </div>
+    </div>
+</div>
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("HideLoader", ".loader-wrapper");
+        }
+    }
+}

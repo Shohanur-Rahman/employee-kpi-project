@@ -1,0 +1,119 @@
+﻿@page "/login"
+@layout GuestLayout
+@using KPIMS.Core.UiModels
+ @using KPIMS.Core.Models
+ @using KPIMS.Repos.Repositories.Administration.Interfaces
+@using KPIMS.WebApp.Utilities
+@using KPIMS.Core.Utilities
+
+ @rendermode InteractiveServer
+ @inject IJSRuntime JS
+ @inject IEmployeeRepo EmployeeRepo
+ @inject NavigationManager Navigation
+
+@code {
+    private EditContext? editContext;
+    private LoginModel loginModel = new LoginModel();
+    string errorMessage = string.Empty;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-7 login_one_image"></div>
+        <div class="col-xl-5 p-0">
+            <div class="login-card login-dark login-bg">
+                <div>
+                    <div><a class="logo" href="/"><img class="img-fluid for-light login-logo" src="images/logo/UITS-Short-01.png" alt="looginpage"><img class="for-dark m-auto" src="images/logo/dark-logo.png" alt="logo"></a></div>
+                    <div class="login-main">
+                        <EditForm class="theme-form needs-validation" Model="loginModel" OnValidSubmit="SubmitLogin" FormName="loginForm">
+
+                            <h2 class="text-center">Sign in to account</h2>
+                            <p class="text-center">Enter your email &amp; password to login</p>
+                            @if (!string.IsNullOrEmpty(errorMessage))
+                            {
+                                <p class="text-danger text-center">@errorMessage</p>
+                            }
+                            <div class="form-group">
+                                <label class="col-form-label">Email Address</label>
+                                <InputText class="form-control" type="email" required="" @bind-Value="loginModel.Email" placeholder="Test@gmail.com"/>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-form-label">Password</label>
+                                <div class="form-input position-relative">
+                                    <InputText class="form-control" type="password" @bind-Value="loginModel.Password" name="login[password]" required="" placeholder="*********" />
+                                </div>
+                            </div>
+                            <div class="form-group mb-0 checkbox-checked">
+                                <div class="form-check checkbox-solid-info">
+                                    <InputCheckbox class="form-check-input" @bind-Value="loginModel.IsRemember" id="solid6" type="checkbox" />
+                                    <label class="form-check-label" for="solid6">Remember password </label>
+                                </div><a class="link-two" href="forget-password.html">Forgot password?</a>
+                                <div class="text-end mt-3"><button class="btn btn-primary btn-block w-100 text-white" type="submit">Sign in</button></div>
+                            </div>
+                            <div class="login-social-title">
+                                <h6> &nbsp; </h6>
+                            </div>
+                            <div class="form-group">
+                                <ul class="login-social">
+                                    <li><a href="https://www.linkedin.com/" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a></li>
+                                    <li><a href="https://www.facebook.com/" target="_blank"><i class="fa-brands fa-facebook-f"></i></a></li>
+                                    <li><a href="https://twitter.com/" target="_blank"><i class="fa-brands fa-x-twitter"></i></a></li>
+                                    <li><a href="https://www.instagram.com/" target="_blank"><i class="fa-brands fa-youtube"></i></a></li>
+                                </ul>
+                            </div>
+                            <p class="mt-4 mb-0 text-center">Organization user panel only.</p>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        loginModel ??= new();
+        editContext = new(loginModel);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            SessionObjects.EmployeeInSession = new();
+            await JS.InvokeVoidAsync("InitFormValidator", ".needs-validation");
+        }
+    }
+
+    private async Task SubmitLogin()
+    {
+        try
+        {
+            errorMessage = string.Empty;
+
+            var result = await EmployeeRepo.GetAutheticateEmployeeAsync(loginModel);
+
+            if (result is not null)
+            {
+                SessionObjects.EmployeeInSession = result;
+                Navigation.NavigateTo($"redirect?token={EncryptPassword.GetSalt()}");
+            }
+            else
+            {
+                errorMessage = "Invalid credential";
+            }
+        }
+        catch (Exception ex)
+        {
+
+            errorMessage = "Invalid credential";
+        }
+        StateHasChanged();
+    }
+}

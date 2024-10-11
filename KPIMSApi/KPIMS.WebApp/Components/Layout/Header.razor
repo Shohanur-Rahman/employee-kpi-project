@@ -1,0 +1,74 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+
+
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@code {
+    private string? userId;
+    private string? userName;
+    private string? userEmail;
+    private string? userAvatar;
+    private int loggedInUserId;
+}
+
+<header class="page-header row">
+    <div class="logo-wrapper d-flex align-items-center col-auto">
+        <a href="">
+            <img class="for-light logo-img" src="images/logo/UITS-Short-01.png" alt="logo"><img class="for-dark logo-img" src="images/logo/UITS-Short-01.png" alt="logo">
+        </a>
+        <a class="close-btn" href="javascript:void(0)">
+            <div class="toggle-sidebar">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+        </a>
+    </div>
+    <div class="page-main-header col">
+        <div class="header-left d-lg-block d-none">
+        </div>
+        <div class="nav-right">
+            <ul class="header-right">
+                <li class="profile-dropdown custom-dropdown">
+                    <div class="d-flex align-items-center">
+                        <img src="@userAvatar" alt="" class="user-avatar">
+                        <div class="flex-grow-1">
+                            <h5>@userName</h5><span>@userEmail</span>
+                        </div>
+                    </div>
+                    <div class="custom-menu overflow-hidden">
+                        <ul>
+                            <li class="d-flex">
+                                <i class="fa-solid fa-id-card mt-1"></i><a class="ms-2" href="edit-profile">Edit Profile</a>
+                            </li>
+                            <li class="d-flex">
+                                <i class="fa-solid fa-right-from-bracket mt-1"></i><a class="ms-2" href="logout">Log Out</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+@code {
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(ClaimTypes.Authentication)?.Value;
+            userName = user.FindFirst(ClaimTypes.Name)?.Value;
+            userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+            userAvatar = user.FindFirst(ClaimTypes.UserData)?.Value;
+            loggedInUserId = int.Parse(userId);
+        }
+    }
+}

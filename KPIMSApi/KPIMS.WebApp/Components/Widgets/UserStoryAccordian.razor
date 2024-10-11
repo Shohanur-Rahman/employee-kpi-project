@@ -1,0 +1,32 @@
+﻿@using KPIMS.Core.Models
+
+@code {
+    [Parameter]
+    public List<DbWorkItem>? WorkItems { get; set; }
+}
+
+
+@if (WorkItems is not null)
+{
+    <div class="accordion">
+        @foreach (var usItem in WorkItems)
+        {
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_@usItem.Id">
+                    <button class="accordian-small accordion-button accordion-light-info active collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_@usItem.Id" aria-expanded="false" aria-controls="collapse_@usItem.Id">@usItem.Title</button>
+                </h2>
+                <div class="accordion-collapse collapse" id="collapse_@usItem.Id" aria-labelledby="heading_@usItem.Id" data-bs-parent="#simpleaccordion" style="">
+                    <div class="accordion-body">
+                        <p class="mb-0">Web design<em class="font-danger"> identifies the goals</em> of a website or webpage and promotes accessibility for all potential users. This process involves organizing content and images across a series of pages and integrating applications and other interactive elements.</p>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+}
+
+
+@code {
+
+}

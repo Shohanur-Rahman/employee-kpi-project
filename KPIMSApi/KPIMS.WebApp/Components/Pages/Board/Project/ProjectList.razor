@@ -1,0 +1,168 @@
+﻿@page "/projects"
+
+ @using System.Collections.ObjectModel
+ @using KPIMS.Core.Models
+ @using KPIMS.Repos.Repositories.Board.Interfaces
+ @using Microsoft.AspNetCore.Authorization
+
+
+@attribute [Authorize]
+ @rendermode InteractiveServer
+ @inject IJSRuntime JS
+ @inject IProjectRepo ProjectRepo
+
+@code {
+    ObservableCollection<DbProject> projects { get; set; }
+    DbProject? project = new DbProject();
+    int selectedId { get; set; }
+}
+
+<PageTitle>Projects</PageTitle>
+<div class="container-fluid">
+    <div class="row page-title">
+        <div class="col-sm-6">
+            <h3>Projects</h3>
+        </div>
+        <div class="col-sm-6">
+            <nav>
+                <ol class="breadcrumb justify-content-sm-end align-items-center">
+                    <li class="breadcrumb-item"><a href="">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Projects</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-12 col-md-12 mb-2">
+            <button class="btn btn-primary px-xl-2 px-xxl-3 btn-sm" type="button" @onclick="HandleAddClickEvent">
+                <i class="fa-solid fa-plus"></i> Create Nwe Project
+            </button>
+        </div>
+    </div>
+    <div class="row proj-row">
+        @{
+            int slCounet = 1;
+            if (projects is not null)
+            {
+                foreach (var item in projects)
+                {
+                    <div class="col-xl-4 col-md-6 d-flex align-items-stretch">
+                        <div class="card proj-card w-100">
+                            <div class="card-header pb-0">
+                                <div class="card-header-right">
+                                    <ul class="list-unstyled card-option">
+                                        <li>
+                                            <button class="dropdown-toggle proj-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fa-solid fa-ellipsis"></i></button>
+                                            <ul class="dropdown-menu dropdown-block" style="">
+                                                <li class="w-100"><a class="dropdown-item" @onclick="() => HandleEditClickEvent(item)" href="javascript:void(0)"><i class="fa-solid fa-pen-to-square"></i> Edit </a></li>
+                                                <li class="w-100"><a class="dropdown-item" href="javascript:void(0)" @onclick="() => HandleDeleteClickEvent(item)"><i class="fa-solid fa-check"></i> Closed</a></li>
+                                                <li class="w-100"><a class="dropdown-item" href="#"><i class="fa-solid fa-info"></i> Description</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <a href="projects/@item.Id?token=@Guid.NewGuid().ToString()" class="w-100">
+                                <div class="card-body">
+                                    <div class="proj-box">
+                                        <div class="proj-icon">
+                                            @if (!string.IsNullOrEmpty(item.Logo))
+                                            {
+                                                <div class="proj-logo" style="background: transparent !important;"><img src="@item.Logo" /></div>
+                                            }
+                                            else
+                                            {
+                                                <div class="proj-logo" style="background: @GenerateRandomHexColor();">@item.Title[0]</div>
+                                            }
+                                        </div>
+                                        <div class="proj-details">
+                                            <h4 class="proj-title">@item.Title</h4>
+                                            <p>@item.Summary</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    slCounet++;
+                }
+            }
+        }
+    </div>
+</div>
+
+<ProjectForm Project="project" ButtonClicked="LoadData"/>
+<DeleteModal ButtonClicked="DeleteProject" />
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("HideLoader", ".loader-wrapper");
+        }
+    }
+
+    async Task LoadData()
+    {
+        projects = new ObservableCollection<DbProject>(await ProjectRepo.GetProjectsAsync());
+        StateHasChanged();
+    }
+
+    public static string GenerateRandomHexColor()
+    {
+        Random random = new Random();
+        // Generate random values for red, green, and blue
+        int r = random.Next(0, 256);
+        int g = random.Next(0, 256);
+        int b = random.Next(0, 256);
+
+        // Format as hex
+        return $"#{r:X2}{g:X2}{b:X2}";
+    }
+
+    private async Task HandleEditClickEvent(DbProject model)
+    {
+        project = model;
+        await OpenModal();
+        StateHasChanged();
+    }
+    private async Task HandleAddClickEvent()
+    {
+        project = new DbProject();
+        await OpenModal();
+        StateHasChanged();
+    }
+
+    private async Task OpenModal()
+    {
+        await Task.Delay(100);
+        await JS.InvokeVoidAsync("InitFormValidator", ".needs-validation");
+        await JS.InvokeVoidAsync("OpenModal", "#projectModal");
+    }
+
+    private async Task HandleDeleteClickEvent(DbProject model)
+    {
+        selectedId = model.Id;
+        await JS.InvokeVoidAsync("OpenModal", "#deleteModel");
+    }
+
+    private async Task DeleteProject()
+    {
+        await ProjectRepo.DeleteProjectAsync(selectedId);
+        await LoadData();
+        await JS.InvokeVoidAsync("HideModal", "#deleteModel");
+        await JS.InvokeVoidAsync("ShowSuccessToast", "Employee has been deleted successfully.");
+    }
+
+}

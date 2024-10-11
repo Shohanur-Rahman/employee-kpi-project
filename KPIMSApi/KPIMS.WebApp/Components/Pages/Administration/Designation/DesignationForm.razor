@@ -1,0 +1,92 @@
+﻿ @using KPIMS.Core.Models
+ @using KPIMS.Repos.Repositories.Administration.Interfaces
+
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject IDesignationRepo DesignationRepo
+
+@code {
+    [Parameter]
+    public DbDesignation Designation { get; set; }
+    [Parameter]
+    public EventCallback ButtonClicked { get; set; }
+
+    private DbDesignation desgnationModel = new DbDesignation();
+}
+
+<div class="modal fade" id="designationModal" tabindex="-1" role="dialog" aria-labelledby="designationModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-toggle-wrapper social-profile text-start dark-sign-up">
+                <h3 class="modal-header justify-content-center border-0">@(desgnationModel?.Id > 0 ? "Edit Designation": "Add Designation") </h3>
+                <div class="modal-body">
+                    <EditForm class="row g-3 needs-validation" novalidate="" Model="@desgnationModel" OnValidSubmit="SubmitDesignation">
+                        <div class="col-md-6">
+                            <label class="form-label" for="validationCustom01">Designation</label>
+                            <InputText class="form-control" @bind-Value="desgnationModel.Name" id="validationCustom01" type="text" placeholder="Enter designation name" required="" />
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="validationCustom02">Order</label>
+                            <InputNumber class="form-control" @bind-Value="desgnationModel.OrderId" id="validationCustom02" type="text" placeholder="Enter your surname" required="" />
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-secondary" @onclick="HideModal">Close</button>
+                            <button type="submit" class="btn btn-primary float-end">Save changes</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    protected override async void OnParametersSet()
+    {
+        desgnationModel = (Designation is not null) ? Designation : new DbDesignation();
+    }
+    
+    private bool ValidateForm()
+    {
+        return (!string.IsNullOrEmpty(desgnationModel.Name));
+    }
+
+    private async Task SubmitDesignation()
+    {
+        try
+        {
+            DbDesignation? result = new DbDesignation();
+
+            if (!ValidateForm()) return;
+
+            if (desgnationModel is not null && desgnationModel.Id == 0)
+            {
+                result = await DesignationRepo.SaveDesignationAsync(desgnationModel);
+            }
+            else if (desgnationModel is not null && desgnationModel.Id > 0)
+            {
+                result = await DesignationRepo.UpdateDesignationAsync(desgnationModel);
+            }
+
+            if (result?.Id > 0)
+            {
+                await ButtonClicked.InvokeAsync();
+                await HideModal();
+                await JS.InvokeVoidAsync("ShowSuccessToast", "Designation has been added successfully.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("ShowErrorToast", "Something went wrong!.");
+            throw;
+        }
+    }
+    private async Task HideModal()
+    {
+        desgnationModel = new DbDesignation();
+        await JS.InvokeVoidAsync("HideModal", "#designationModal");
+    }
+}

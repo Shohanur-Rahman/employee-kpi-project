@@ -1,0 +1,172 @@
+﻿ @using KPIMS.Core.Models
+ @using KPIMS.Repos.Repositories.Administration.Interfaces
+ @using KPIMS.WebApp.Utilities
+
+ @rendermode InteractiveServer
+ @inject IJSRuntime JS
+ @inject IEmployeeRepo EmployeeRepo
+ @inject IDesignationRepo DesignationRepo
+ @inject HelperService HelperService
+
+@code {
+    [Parameter]
+    public DbEmployee Employee { get; set; }
+    [Parameter]
+    public EventCallback ButtonClicked { get; set; }
+
+    private DbEmployee employeModel = new DbEmployee();
+    private List<DbDesignation> designations = new List<DbDesignation>();
+    private string? imagePreviewUrl = "images/avatar/1.png";
+}
+
+
+<div class="modal fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="employeeModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-toggle-wrapper social-profile text-start dark-sign-up">
+                <h3 class="modal-header justify-content-center border-0">@(employeModel?.Id > 0 ? "Edit Employee" : "Add Employee") </h3>
+                <div class="modal-body">
+                    <EditForm class="row g-3 needs-validation" novalidate="" Model="@employeModel" OnValidSubmit="SubmitEmployee">
+                        <div class="col-md-6">
+                            <label class="form-label" for="txtFirstName">First Name</label>
+                            <InputText class="form-control" @bind-Value="employeModel.FirstName" id="txtFirstName" type="text" placeholder="Enter employee first name" required="" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="txtLastName">Last Name</label>
+                            <InputText class="form-control" @bind-Value="employeModel.LastName" id="txtLastName" type="text" placeholder="Enter employee last name" required="" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label" for="txtEmail">Email</label>
+                            <InputText class="form-control" @bind-Value="employeModel.Email" id="txtEmail" type="email" placeholder="Enter employee email" required="" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label" for="ddlDesignation">Designation</label>
+                            <InputSelect class="form-control form-select" @bind-Value="employeModel.DesignationId" id="ddlDesignation">
+                                @foreach (var designation in designations)
+                                {
+                                    <option value="@designation.Id">@designation.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="txtMobile">Mobile</label>
+                            <InputText class="form-control" @bind-Value="employeModel.Mobile" id="txtMobile" type="text" placeholder="Enter employee last name" required="" />
+                        </div>
+
+                        @if (employeModel?.Id == 0)
+                        {
+                            <div class="col-md-6">
+                                <label class="form-label" for="txtPassword">Password</label>
+                                <InputText class="form-control" @bind-Value="employeModel.Password" id="txtPassword" type="password" placeholder="Enter login password" required="" />
+                            </div>
+                        }
+                        <div class="col-md-12">
+                            <label class="form-label" for="fileLogo">
+                                <img src="@imagePreviewUrl" alt="File Preview" class="no-img-preview" />
+                            </label>
+                            <InputFile class="form-control d-none" @bind-Value="employeModel.Image" OnChange="OnFileSelected" id="fileLogo" type="file" />
+                            @if (!string.IsNullOrEmpty(employeModel.Avatar))
+                            {
+                                <button @onclick="RemoveFile" type="button" class="btn btn-default-outline">Remove File</button>
+                            }
+                        </div>
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-secondary" @onclick="HideModal">Close</button>
+                            <button type="submit" class="btn btn-primary float-end">Save changes</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    protected override async void OnParametersSet()
+    {
+        employeModel = (Employee is not null) ? Employee : new DbEmployee();
+        imagePreviewUrl = (!string.IsNullOrEmpty(employeModel.Avatar)) ? employeModel.Avatar : "images/logo/no-image-icon.png";
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            designations = await DesignationRepo.GetDesignationsAsync();
+        }
+    }
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        if (e.FileCount > 0)
+        {
+            var file = e.File;
+            employeModel.Image = file;
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
+
+            imagePreviewUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
+        }
+        else
+        {
+            imagePreviewUrl = "images/logo/no-image-icon.png";
+        }
+    }
+
+    private async Task RemoveFile()
+    {
+        await JS.InvokeVoidAsync("removeFileInputValue", "#fileLogo");
+        imagePreviewUrl = "images/logo/no-image-icon.png";
+        StateHasChanged();
+    }
+
+    private bool ValidateForm()
+    {
+        return (!string.IsNullOrEmpty(employeModel.FirstName) || !string.IsNullOrEmpty(employeModel.LastName) || !string.IsNullOrEmpty(employeModel.Email) || !string.IsNullOrEmpty(employeModel.Password));
+    }
+
+    private async Task SubmitEmployee()
+    {
+        try
+        {
+            string message = string.Empty;
+            DbEmployee? result = new DbEmployee();
+
+            if (!ValidateForm()) return;
+
+            var fileResponse = await HelperService.UploadFileLocalyAndGetUrl(employeModel.Image, "Logos");
+            employeModel.Avatar = (!string.IsNullOrEmpty(fileResponse?.FilePath)) ? fileResponse?.FilePath : imagePreviewUrl;
+
+            if (employeModel is not null && employeModel.Id == 0)
+            {
+                message = "Employee has been added successfully.";
+                result = await EmployeeRepo.SaveEmployeeAsync(employeModel);
+            }
+            else if (employeModel is not null && employeModel.Id > 0)
+            {
+                message = "Employee has been updated successfully.";
+                result = await EmployeeRepo.UpdateEmployeeAsync(employeModel);
+            }
+
+            imagePreviewUrl = "images/logo/no-image-icon.png";
+            if (result?.Id > 0)
+            {
+                await ButtonClicked.InvokeAsync();
+                await HideModal();
+                await JS.InvokeVoidAsync("ShowSuccessToast", @message);
+            }
+        }
+        catch (Exception ex)
+        {
+
+            await JS.InvokeVoidAsync("ShowErrorToast", "Something went wrong!");
+            await HideModal();
+        }
+    }
+    private async Task HideModal()
+    {
+        employeModel = new DbEmployee();
+        await JS.InvokeVoidAsync("HideModal", "#employeeModal");
+    }
+}

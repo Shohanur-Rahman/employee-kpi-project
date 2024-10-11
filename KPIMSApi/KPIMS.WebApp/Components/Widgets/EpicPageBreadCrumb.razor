@@ -1,0 +1,37 @@
+﻿@using KPIMS.Core.Models
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string? URLtoken { get; set; }
+    [Parameter]
+    public DbProject? Project { get; set; }
+}
+
+<div class="container-fluid">
+    <div class="row page-title">
+        <div class="col-sm-6">
+            <h3>@Project?.Title</h3>
+        </div>
+        <div class="col-sm-6">
+            <nav>
+                <ol class="breadcrumb justify-content-sm-end align-items-center">
+                    <li class="breadcrumb-item"><a href="">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/projects">Projects</a></li>
+                    <li class="breadcrumb-item"><a href="/projects/@Id?token=@URLtoken">@Project?.Title</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Epics</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-sm-12">
+            <p>@Project?.Summary</p>
+        </div>
+    </div>
+</div>
+
+@code{
+   
+}
+
+

@@ -1,0 +1,102 @@
+﻿@using KPIMS.Repos.Repositories.Board.Interfaces
+@using KPIMS.Repos.Repositories.Common.Interfaces
+@using KPIMS.Repos.Repositories.Administration.Interfaces
+@using KPIMS.Core.Models
+@using KPIMS.Core.Utilities
+
+@inject IWorkItemRepo WorkItemRepo
+@inject IEmployeeRepo EmployeeRepo
+
+@code {
+    [Parameter]
+    public int CurrentItemId { get; set; }
+    [Parameter]
+    public int StateChangeCount { get; set; }
+
+    List<DbWorkItemLog> workItemLogs = new List<DbWorkItemLog>();
+    List<DbEmployee> employees = new List<DbEmployee>();
+}
+@if (workItemLogs is not null)
+{
+    foreach (var log in workItemLogs)
+    {
+        DbEmployee? employee = new DbEmployee();
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="flex-space flex-wrap align-items-center">
+                                
+
+                                <ul class="log-list w-100">
+                                    <li>
+                                        @if (log.CreatedId > 0)
+                                        {
+                                            employee = employees.Where(e => e.Id == log.CreatedId).FirstOrDefault();
+                                            if (employee is not null)
+                                            {
+                                                <img class="tab-img img-30" src="@employee.Avatar" alt="profile">
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <img class="tab-img img-30" src="images/avatar/1.png" alt="profile">
+                                        }
+                                    </li>
+                                    <li><strong>@employee.FullName :</strong> >@log.LogType on <strong>@log.CreatedDate?.ToString("dd MMM yyyy")</strong></li>
+                                </ul>
+                                <ul class="log-list w-100">
+                                    <li><strong>Type:</strong>@log?.WorkType?.Title</li>
+                                    <li><strong>State:</strong>@log?.State?.Title</li>
+                                    <li><strong>Story Point: </strong>@log?.StoryPoint</li>
+                                    <li><strong>Start Date: </strong>@log?.StartDate?.ToString("dd MMM yyyy")</li>
+                                    <li><strong>End Date: </strong>@log?.EndDate?.ToString("dd MMM yyyy")</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <h6>Description</h6>
+                            <hr/>
+                            <div class="w-100 comment-texts">
+                                @((MarkupString)log.Description)
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <h6>Acceptance Criteria</h6>
+                            <hr />
+                            <div class="w-100 comment-texts">
+                                @((MarkupString)log.AcceptanceCreteria)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    protected override async void OnParametersSet()
+    {
+        if (StateChangeCount > 0)
+        {
+            await LoadChangeLogs();
+            StateHasChanged();
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadChangeLogs();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadChangeLogs()
+    {
+        employees = await EmployeeRepo.GetEmployeesOnlyAsync();
+        workItemLogs = await WorkItemRepo.GetWorkImteChangeLogAsync(CurrentItemId);
+    }
+}

@@ -1,0 +1,99 @@
+.login-logo{
+    max-height: 80px;
+}
+.logo-img {
+    max-width: 135px;
+}
+li.profile-dropdown.custom-dropdown {
+    cursor: pointer !important;
+}
+table.dataTable tbody td {
+    padding: 8px 10px !important;
+}
+.img-round {
+    border-radius: 50%;
+}
+hr {
+    border: 1px dashed #ddd !important;
+    background-color: #ddd !important;
+}
+img.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+}
+.proj-box {
+    display: flex;
+    gap: 15px;
+}
+.proj-logo {
+    font-weight: bold;
+    font-size: 37px;
+    background: #2c03c6;
+    width: 60px;
+    text-align: center;
+    color: #fff;
+    border-radius: 3px;
+    margin-bottom: 10px;
+}
+.proj-title {
+    letter-spacing: 2px;
+    word-spacing: 4px;
+    text-shadow: 2px 2px 4px rgb(124 124 124 / 50%);
+    margin-bottom: 10px;
+}
+.proj-list li{
+    display: inline-block;
+}
+.proj-btn {
+    background: transparent;
+    border: none;
+}
+
+.proj-card {
+    box-shadow: 0 3.2px 7.2px 0 rgb(0 0 0 / 5%), 0 .6px 1.8px 0 rgb(0 0 0 / 10%);
+}
+    .proj-card .card-header-right{
+        padding: 0 !important;
+        background: none !important;
+
+    }
+
+.no-img-preview {
+    max-width: 120px;
+    max-height: 120px;
+    padding: 10px;
+    background: #ddd;
+    border: 1px solid #ccc;
+    margin: 1px;
+}
+
+.proj-logo img {
+    max-width: 100%;
+}
+
+.accordian-small {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+}
+
+.commentor {
+    float: left;
+    margin-right: 5px;
+}
+
+.comment-info {
+    padding-top: 5px;
+    border-bottom: 1px dashed #ddd;
+}
+.ql-editor {
+    min-height: 120px !important;
+}
+.img-30{
+    height: 30px;
+}
+
+.log-list li {
+    float: left;
+    margin-right: 10px;
+}

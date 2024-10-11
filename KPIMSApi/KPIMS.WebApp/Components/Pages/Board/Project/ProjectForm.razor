@@ -1,0 +1,132 @@
+﻿ @using KPIMS.Core.Models
+ @using KPIMS.Repos.Repositories.Board.Interfaces
+ @using KPIMS.WebApp.Utilities
+
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject IProjectRepo ProjectRepo
+@inject HelperService HelperService
+
+@code {
+    [Parameter]
+    public DbProject? Project { get; set; }
+    [Parameter]
+    public EventCallback ButtonClicked { get; set; }
+
+    private DbProject model = new DbProject();
+    private string? imagePreviewUrl = "images/logo/no-image-icon.png";
+}
+
+<div class="modal fade" id="projectModal" tabindex="-1" role="dialog" aria-labelledby="projectModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-toggle-wrapper social-profile text-start dark-sign-up">
+                <h3 class="modal-header justify-content-center border-0">@(model?.Id > 0 ? "Edit Project" : "Add Project") </h3>
+                <div class="modal-body">
+                    <EditForm class="row g-3 needs-validation" novalidate="" Model="@model" OnValidSubmit="SubmitDesignation">
+                        <div class="col-md-12">
+                            <label class="form-label" for="txtTitle">Title</label>
+                            <InputText class="form-control" @bind-Value="model.Title" id="txtTitle" type="text" placeholder="Enter project title" required="" />
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label" for="txtSummary">Summary</label>
+                            <InputText class="form-control" @bind-Value="model.Summary" id="txtSummary" type="text" placeholder="Enter project summary" required="" />
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label" for="fileLogo">
+                                <img src="@imagePreviewUrl" alt="File Preview" class="no-img-preview" />
+                            </label>
+                            <InputFile class="form-control d-none" @bind-Value="model.Image" OnChange="OnFileSelected" id="fileLogo" type="file" />
+                            @if (!string.IsNullOrEmpty(model.Logo))
+                            {
+                                <button @onclick="RemoveFile" type="button" class="btn btn-default-outline">Remove File</button>
+                            }
+                        </div>
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-secondary" @onclick="HideModal">Close</button>
+                            <button type="submit" class="btn btn-primary float-end">Save changes</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    protected override async void OnParametersSet()
+    {
+        model = (Project is not null) ? Project : new DbProject();
+        imagePreviewUrl = (!string.IsNullOrEmpty(model.Logo)) ? model.Logo : "images/logo/no-image-icon.png";
+    }
+    private async Task RemoveFile()
+    {
+        await JS.InvokeVoidAsync("removeFileInputValue", "#fileLogo");
+        imagePreviewUrl = "images/logo/no-image-icon.png";
+        StateHasChanged();
+    }
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        if (e.FileCount > 0)
+        {
+            var file = e.File;
+            model.Image = file;
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
+
+            imagePreviewUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
+        }
+        else
+        {
+            imagePreviewUrl = "images/logo/no-image-icon.png";
+        }
+    }
+
+    private bool ValidateForm()
+    {
+        return (!string.IsNullOrEmpty(model.Title) && !string.IsNullOrEmpty(model.Summary));
+    }
+
+
+    private async Task SubmitDesignation()
+    {
+        try
+        {
+            DbProject? result = new DbProject();
+
+            if (!ValidateForm()) return;
+
+            var fileResponse = await HelperService.UploadFileLocalyAndGetUrl(model.Image, "Logos");
+            model.Logo = fileResponse?.FilePath;
+
+            if (model is not null && model.Id == 0)
+            {
+                result = await ProjectRepo.SaveProjectAsync(model);
+            }
+            else if (model is not null && model.Id > 0)
+            {
+                result = await ProjectRepo.UpdateProjectAsync(model);
+            }
+
+            if (result?.Id > 0)
+            {
+                await ButtonClicked.InvokeAsync();
+                await HideModal();
+                await JS.InvokeVoidAsync("ShowSuccessToast", "Project has been added successfully.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("ShowErrorToast", "Something went wrong!.");
+            throw;
+        }
+    }
+    private async Task HideModal()
+    {
+        model = new DbProject();
+        await JS.InvokeVoidAsync("HideModal", "#projectModal");
+    }
+}

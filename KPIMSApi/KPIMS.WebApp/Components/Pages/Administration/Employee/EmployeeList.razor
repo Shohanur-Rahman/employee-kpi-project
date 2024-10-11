@@ -1,0 +1,162 @@
+﻿ @page "/employees"
+
+ @using System.Collections.ObjectModel
+ @using KPIMS.Core.Models
+ @using KPIMS.Repos.Repositories.Administration.Interfaces
+ @using Microsoft.AspNetCore.Authorization
+
+
+@attribute [Authorize]
+ @rendermode InteractiveServer
+ @inject IJSRuntime JS
+ @inject IEmployeeRepo EmployeeRepo
+
+@code {
+    ObservableCollection<DbEmployee> employees { get; set; }
+    DbEmployee? employee { get; set; }
+    int selectedId { get; set; }
+}
+
+
+<PageTitle>Employees</PageTitle>
+
+<div class="container-fluid">
+    <div class="row page-title">
+        <div class="col-sm-6">
+            <h3>Employees</h3>
+        </div>
+        <div class="col-sm-6">
+            <nav>
+                <ol class="breadcrumb justify-content-sm-end align-items-center">
+                    <li class="breadcrumb-item"><a href="">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Employees</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header pb-0 card-no-border">
+                    <button class="btn btn-primary px-xl-2 px-xxl-3 btn-sm" type="button" @onclick="HandleAddClickEvent">
+                        <i class="fa-solid fa-plus"></i> New Employee
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="display" id="employeeTable">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Name</th>
+                                    <th>Designation</th>
+                                    <th>Email</th>
+                                    <th>Mobile</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @{
+                                    int slCounet = 1;
+                                    if (employees is not null)
+                                    {
+                                        foreach (var item in employees)
+                                        {
+                                            <tr>
+                                                <td>@slCounet</td>
+                                                            <td><img class="img-30 me-2 img-round" src="@(item.Avatar is not null ? item.Avatar : "images/avatar/1.png")" alt="profile"> @item.FullName</td>
+                                                <td>@item.Designation?.Name</td>
+                                                <td>@item.Email</td>
+                                                <td>@item.Mobile</td>
+                                                <td>
+                                                    <button class="btn btn-primary mb-1" @onclick="() => HandleEditClickEvent(item)"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                    <button class="btn btn-danger" @onclick="() => HandleDeleteClickEvent(item)"><i class="fa-solid fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+
+                                            slCounet++;
+                                        }
+                                    }
+                                }
+
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<EmployeeForm Employee="employee" ButtonClicked="LoadData" />
+<DeleteModal ButtonClicked="DeleteEmployee" />
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("LoadDataTable", "#employeeTable");
+            await JS.InvokeVoidAsync("HideLoader", ".loader-wrapper");
+        }
+    }
+
+    async Task LoadData()
+    {
+        employees = new ObservableCollection<DbEmployee>(await GetEmployeesAsync());
+        StateHasChanged();
+    }
+
+    async Task<List<DbEmployee>> GetEmployeesAsync()
+    {
+        return await EmployeeRepo.GetEmployeesAsync();
+    }
+
+    private async Task HandleAddClickEvent()
+    {
+        employee = new DbEmployee();
+        await OpenModal();
+        StateHasChanged();
+    }
+
+    private async Task OpenModal()
+    {
+        await Task.Delay(100);
+        await JS.InvokeVoidAsync("InitFormValidator", ".needs-validation");
+        await JS.InvokeVoidAsync("OpenModal", "#employeeModal");
+    }
+
+    private async Task HandleEditClickEvent(DbEmployee model)
+    {
+        employee = model;
+        await OpenModal();
+        StateHasChanged();
+    }
+
+    private async Task HandleDeleteClickEvent(DbEmployee model)
+    {
+        selectedId = model.Id;
+        await JS.InvokeVoidAsync("OpenModal", "#deleteModel");
+    }
+
+    private async Task DeleteEmployee()
+    {
+        await EmployeeRepo.DeleteEmployeeAsync(selectedId);
+        await LoadData();
+        await JS.InvokeVoidAsync("HideModal", "#deleteModel");
+        await JS.InvokeVoidAsync("ShowSuccessToast", "Employee has been deleted successfully.");
+    }
+}

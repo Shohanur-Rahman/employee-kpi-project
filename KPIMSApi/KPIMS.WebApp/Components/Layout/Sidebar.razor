@@ -1,0 +1,57 @@
+﻿<aside class="page-sidebar" data-sidebar-layout="stroke-svg">
+    <div class="left-arrow" id="left-arrow">
+        <i class="fa-solid fa-arrow-left"></i>
+    </div>
+    <div id="sidebar-menu">
+        <ul class="sidebar-menu" id="simple-bar">
+            <li class="sidebar-list">
+                <a class="sidebar-link" href="/">
+                    <i class="fa-solid fa-house"></i><span>Dashboard</span>
+                </a>
+            </li>
+
+            <li class="sidebar-list">
+                <a class="sidebar-link" href="javascript:void(0)">
+                    <i class="fa-solid fa-chess-board"></i><span>Board</span>
+                    <div class="badge badge-primary rounded-pill">3</div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li>
+                        <a href="projects">
+                            <i class="fa-solid fa-arrow-right"></i> &nbsp; Projects
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="sidebar-list">
+                <a class="sidebar-link" href="javascript:void(0)">
+                    <i class="fa-solid fa-gear"></i><span>Administration</span>
+                    <div class="badge badge-primary rounded-pill">2</div>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li>
+                        <NavLink class="nav-link" href="designations">
+                            <i class="fa-solid fa-arrow-right"></i> &nbsp; Designations
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink class="nav-link" href="employees">
+                            <i class="fa-solid fa-arrow-right"></i> &nbsp; Employees
+                        </NavLink>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+    </div>
+    <div class="right-arrow" id="right-arrow">
+        <i class="fa-solid fa-arrow-right"></i>
+    </div>
+</aside>
+
+@code {
+
+}

@@ -1,0 +1,149 @@
+﻿ @using System.Collections.ObjectModel
+ @using KPIMS.Core.Models
+ @using KPIMS.Core.UiModels
+ @using KPIMS.Repos.Repositories.Administration.Interfaces
+ @using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject IEmployeeRepo EmployeeRepo
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@code {
+
+    public DbEmployee? employee { get; set; }
+    ChangePassword passwordModel = new ChangePassword();
+    private string errorMessage = string.Empty;
+    private string? userEmail;
+}
+
+<div class="card">
+    <div class="card-header">
+        <h4 class="card-title mb-0">My Profile</h4>
+        <div class="card-options"><a class="card-options-collapse" href="#" data-bs-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a><a class="card-options-remove" href="#" data-bs-toggle="card-remove"><i class="fe fe-x"></i></a></div>
+    </div>
+    <div class="card-body">
+        <div class="row mb-2">
+            <div class="profile-title">
+                <div class="d-flex">
+                    <img class="img-70 rounded-circle" alt="" src="@(employee?.Avatar is not null ? employee.Avatar : "images/avatar/1.png")">
+                    <div class="flex-grow-1">
+                        <h5 class="mb-1 text-uppercase">@employee?.FullName</h5>
+                        <p>@employee?.Designation?.Name</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email-Address</label>
+            <input class="form-control" value="@employee?.Email" placeholder="your-email@domain.com" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Mobile</label>
+            <input class="form-control" type="text" value="@employee?.Mobile" disabled>
+        </div>
+        <div class="mb-3">
+            <button class="btn m-1 btn-xs btn-primary" type="button" @onclick="ChangePasswordClick">Change Your Password Now?</button>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModal" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-toggle-wrapper social-profile text-start dark-sign-up">
+                <h3 class="modal-header justify-content-center border-0">Change Password</h3>
+                <div class="modal-body">
+                    <EditForm class="row g-3 needs-validation" novalidate="" Model="@passwordModel" OnValidSubmit="SendChangePasswordRequest">
+                        <div class="col-md-12">
+                            <label class="form-label" for="txtOldPassword">Old Password</label>
+                            <InputText class="form-control" @bind-Value="passwordModel.OldPassword" id="txtOldPassword" type="password" placeholder="Enter current password" required="" />
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label" for="txtNewPassword">New Password</label>
+                            <InputText class="form-control" @bind-Value="passwordModel.NewPassword" id="txtNewPassword" type="password" placeholder="Enter your surname" required="" />
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label" for="txtConfirmedPassword">Confirmed Password</label>
+                            <InputText class="form-control" @bind-Value="passwordModel.ConfirmPassword" id="txtConfirmedPassword" type="password" placeholder="Enter your surname" required="" />
+                            <div class="valid-feedback">Looks good!</div>
+                            <span class="text-danger">@errorMessage</span>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-secondary" @onclick="HideModal">Close</button>
+                            <button type="submit" class="btn btn-primary float-end">Update Password</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+            await LoadData();
+        }
+    }
+
+    async Task LoadData()
+    {
+        employee = await EmployeeRepo.GetEmployeeByEmailAsync(userEmail);
+        passwordModel.Email = employee.Email;
+        StateHasChanged();
+    }
+
+    private async Task HideModal()
+    {
+        await Task.Delay(100);
+        passwordModel = new ChangePassword();
+        await JS.InvokeVoidAsync("HideModal", "#passwordModal");
+    }
+
+    private async Task ChangePasswordClick()
+    {
+        await Task.Delay(100);
+        await JS.InvokeVoidAsync("OpenModal", "#passwordModal");
+        await JS.InvokeVoidAsync("InitFormValidator", ".needs-validation");
+    }
+
+    private bool ValidateForm()
+    {
+        return (!string.IsNullOrEmpty(passwordModel.ConfirmPassword) || !string.IsNullOrEmpty(passwordModel.OldPassword) || !string.IsNullOrEmpty(passwordModel.NewPassword));
+    }
+
+    private async Task SendChangePasswordRequest()
+    {
+        if (!ValidateForm()) return;
+
+        if(passwordModel.NewPassword != passwordModel.ConfirmPassword)
+        {
+            errorMessage = "Password not matched!";
+            StateHasChanged();
+            await Task.Delay(100);
+            return;
+        }
+
+        var result = await EmployeeRepo.UpdatePasswordAsync(passwordModel);
+
+        if (result?.Id > 0)
+        {
+            await HideModal();
+            await JS.InvokeVoidAsync("ShowSuccessToast", "Password has been changed successfully.");
+        }
+        await LoadData();
+    }
+}

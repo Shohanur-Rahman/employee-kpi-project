@@ -1,0 +1,44 @@
+﻿@using KPIMS.Core.Models
+@using KPIMS.Core.Utilities
+
+@code {
+    [Parameter]
+    public List<DbWorkItem>? WorkItems { get; set; }
+    [Parameter]
+    public int ProjectId { get; set; }
+    [Parameter]
+    public int EpicId { get; set; }
+    [Parameter]
+    public string? URLtoken { get; set; }
+}
+
+@if (WorkItems is not null)
+{
+    <div class="accordion">
+        @foreach (var subItem in WorkItems)
+        {
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_@subItem.Id">
+                    <button class="accordian-small accordion-button accordion-light-secondary active collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_@subItem.Id" aria-expanded="false" aria-controls="collapse_@subItem.Id">@subItem.Title</button>
+                </h2>
+                <div class="accordion-collapse collapse" id="collapse_@subItem.Id" aria-labelledby="heading_@subItem.Id" data-bs-parent="#simpleaccordion" style="">
+                    <div class="accordion-body">
+                        <div class="w-100 mb-2">
+                            <a class="btn btn-primary px-xl-2 px-xxl-3 btn-sm" href="projects/@ProjectId/workitems/add-workitem?type=@WorksType.UserStory.&token=@URLtoken">
+                                <i class="fa-solid fa-plus"></i>
+                            </a>
+                            <a class="btn btn-primary px-xl-2 px-xxl-3 btn-sm float-end" href="projects/@ProjectId/workitems/edit-workitem/@subItem.Id?type=@subItem.WorkTypeId&token=@URLtoken">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                        </div>
+                        <UserStoryAccordian WorkItems="subItem.SubWorks?.ToList()" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+
+}

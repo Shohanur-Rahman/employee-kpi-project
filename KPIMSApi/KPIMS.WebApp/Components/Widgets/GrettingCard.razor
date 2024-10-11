@@ -1,0 +1,60 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
+@code {
+    private string? userName;
+    private string? userEmail;
+    private string? userAvatar;
+}
+<div class="card profile-greeting card-hover">
+    <div class="card-body">
+        <div class="img-overlay">
+            <h1>@GetGreetingMessage(), @userName</h1>
+            <p>Welcome to the KPIMS! We are delighted that you have visited our dashboard.</p>
+            <a class="btn btn-primary btn-sm" href="work-items">View Work Items</a>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userName = user.FindFirst(ClaimTypes.Name)?.Value;
+            userEmail = user.FindFirst(ClaimTypes.Authentication)?.Value;
+            userAvatar = user.FindFirst(ClaimTypes.UserData)?.Value;
+        }
+    }
+
+    private string GetGreetingMessage()
+    {
+        DateTime now = DateTime.Now;
+
+        string greeting;
+
+        if (now.Hour < 12)
+        {
+            greeting = "Good Morning!";
+        }
+        else if (now.Hour < 18)
+        {
+            greeting = "Good Afternoon!";
+        }
+        else
+        {
+            greeting = "Good Evening!";
+        }
+
+        return greeting;
+    }
+}

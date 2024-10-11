@@ -1,0 +1,91 @@
+﻿@page "/projects/{id:int}"
+
+@using KPIMS.Repos.Repositories.Board.Interfaces
+@using KPIMS.Core.Models
+@using Microsoft.AspNetCore.Authorization
+@using System.Collections.ObjectModel
+@using KPIMS.Core.Utilities
+
+
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+@inject IProjectRepo ProjectRepo
+@inject IJSRuntime JS
+@inject IWorkItemRepo WorkItemRepo
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private string? URLtoken { get; set; }
+    DbProject? project = new DbProject();
+    List<DbWorkItem>? epics { get; set; }
+}
+<PageTitle>@project?.Title</PageTitle>
+<EpicPageBreadCrumb Id="Id" URLtoken="URLtoken" Project="project" />
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Simple accordion-->
+            <div class="card">
+                <div class="card-header pb-0">
+                    <h4>Epics</h4>
+                    <div class="card-header-right">
+                        <a class="btn btn-primary px-xl-2 px-xxl-3 btn-sm" href="projects/@project?.Id/workitems/add-workitem?token=@URLtoken">
+                            <i class="fa-solid fa-plus"></i> Create New Work
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    @{
+                        if (epics is not null && epics.Count() > 0)
+                        {
+                            <EpicAccordian WorkItems="epics" ProjectId="Id" URLtoken="@URLtoken" />
+                        }
+                        else
+                        {
+                            <div class="card mt-3">
+                                <div class="card-body">
+                                    <h3 class="text-center">Please create an Epic to start work log!</h3>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+
+        if (query.TryGetValue("token", out var token))
+        {
+            URLtoken = token;
+        }
+        project = await ProjectRepo.GetProjectByIdAsync(Id);
+        StateHasChanged();
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadData();
+            await JS.InvokeVoidAsync("HideLoader", ".loader-wrapper");
+        }
+    }
+
+    private async Task LoadData()
+    {
+        epics = await WorkItemRepo.GetWorkItemsByTypeAsync(WorksType.Epic, Id);
+        StateHasChanged();
+    }
+}

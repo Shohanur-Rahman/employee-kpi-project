@@ -1,0 +1,269 @@
+﻿@using KPIMS.Repos.Repositories.Board.Interfaces
+@using KPIMS.Repos.Repositories.Common.Interfaces
+@using KPIMS.Repos.Repositories.Administration.Interfaces
+@using KPIMS.Core.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject IDropdownRepo DropdownRepo
+@inject IWorkItemRepo WorkItemRepo
+@inject IEmployeeRepo EmployeeRepo
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@code {
+    [Parameter]
+    public int ProjectId { get; set; }
+    [Parameter]
+    public int WorkItemId { get; set; }
+    [Parameter]
+    public EventCallback<int> OnValueChanged { get; set; }
+    [Parameter]
+    public EventCallback<int> OnStateChangeEvent { get; set; }
+    DbWorkItem? workItem = new DbWorkItem();
+    private List<DbPrograsState> prograsStates = new List<DbPrograsState>();
+    private List<DbWorkItemType> workItemTypes = new List<DbWorkItemType>();
+    private List<DbWorkItem> parentWorks = new List<DbWorkItem>();
+    private List<DbEmployee> employees = new List<DbEmployee>();
+    private string? stateDetails = string.Empty;
+    private bool isShowParent = false;
+
+    TextEditor AcceptanceCreteriaHtml;
+    TextEditor DescriptionHtml;
+    private string? userId;
+    private int loggedInUserId;
+}
+
+
+<EditForm class="row g-3 needs-validation" novalidate="" Model="@workItem" OnValidSubmit="SubmitEpicForm">
+    <div class="col-md-10">
+        <InputText class="form-control" @bind-Value="workItem.Title" id="txtTitle" type="text" placeholder="Enter the title" required="" />
+        <div class="valid-feedback">Looks good!</div>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary float-end">Save changes</button>
+    </div>
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="w-100">
+                            <h4>Description</h4>
+                            <hr />
+                        </div>
+                        <div class="w-100 pt-2">
+                            <TextEditor Toolbar="new Toolbar { ShowFullToolbar=true }" EditorContainerId="TestId" @ref="@DescriptionHtml"
+                                        Placeholder="Enter non HTML format like centering...">
+                            </TextEditor>
+                        </div>
+                        
+                    </div>
+                    <div class="col-md-12 pt-5">
+                        <div class="w-100">
+                            <h4>Acceptance Criteria</h4>
+                            <hr />
+                        </div>
+                        <div class="w-100 pt-2">
+                            <TextEditor Toolbar="new Toolbar { ShowFullToolbar=true }" EditorContainerId="TestId" @ref="@AcceptanceCreteriaHtml"
+                                        Placeholder="Enter non HTML format like centering...">
+                            </TextEditor>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div clas="row">
+                    <div class="col-md-12 pt-3">
+                        <label class="form-label" for="ddlState">State</label>
+                        <InputSelect class="form-control form-select" Value="workItem.StateId"
+                                     ValueChanged="@((int s) => OnSateChanged(s))" ValueExpression="@(() => workItem.StateId)">
+                            @foreach (var state in prograsStates)
+                            {
+                                <option value="@state.Id">@state.Title</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-12 pt-3">
+                        <label class="form-label" for="txtStateDetails">State Details</label>
+                        <InputText class="form-control" @bind-Value="stateDetails" id="txtStateDetails" type="text" readonly />
+                    </div>
+                    <div class="col-md-12 pt-3">
+                        <label class="form-label" for="ddlState">Assigned To</label>
+                        <InputSelect class="form-control form-select" @bind-Value="workItem.AssignedToId">
+                            @foreach (var emp in employees)
+                            {
+                                <option value="@emp.Id">@emp.FullName</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-12 pt-3">
+                        <label class="form-label" for="txtStoryPoint">Story Point</label>
+                        <InputNumber class="form-control" @bind-Value="workItem.StoryPoint" id="txtStoryPoint" type="number" />
+                    </div>
+                    <div class="col-md-12 pt-3">
+                        <label class="form-label">Type</label>
+                        <InputSelect class="form-control form-select" Value="workItem.WorkTypeId"
+                                     ValueChanged="@((int s) => OnWorkTypeChanged(s))" ValueExpression="@(() => workItem.WorkTypeId)">
+                            @foreach (var item in workItemTypes)
+                            {
+                                <option value="@item.Id">@item.Title</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    @if (isShowParent)
+                    {
+                        <div class="col-md-12 pt-3">
+                            <label class="form-label">Parent</label>
+                            <InputSelect class="form-control form-select" @bind-Value="workItem.ParentWorkId">
+                                @foreach (var item in parentWorks)
+                                {
+                                    <option value="@item.Id">@item.Title  (@item?.WorkTypeId)</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    }
+
+                    <div class="col-md-12 pt-3">
+                        <label class="form-label" for="txtStartDate">Start Date</label>
+                        <InputDate class="form-control" @bind-Value="workItem.StartDate" id="txtStartDate" />
+                    </div>
+                    <div class="col-md-12 pt-3">
+                        <label class="form-label" for="txtStartDate">End Date</label>
+                        <InputDate class="form-control" @bind-Value="workItem.EndDate" id="txtStartDate" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        workItem.ProjectId = ProjectId;
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(ClaimTypes.Authentication)?.Value;
+            loggedInUserId = int.Parse(userId);
+        }
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadDataAsync();
+
+            await JS.InvokeVoidAsync("InitFormValidator", ".needs-validation");
+            StateHasChanged();
+
+            await DescriptionHtml.LoadHTMLContent(workItem.Description);
+            await AcceptanceCreteriaHtml.LoadHTMLContent(workItem.AcceptanceCreteria);
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadDataAsync()
+    {
+
+        try
+        {
+            workItem = await WorkItemRepo.GetWorkItemByIdAsync(WorkItemId);
+            if (workItem is null || workItem?.Id == 0)
+            {
+                workItem = new DbWorkItem()
+                    {
+                        StateId = 1,
+                        WorkTypeId=1,
+                        ProjectId = ProjectId,
+                        CreatedId = loggedInUserId
+                    };
+                prograsStates = prograsStates.Where(x => x.Id == 1).ToList();
+            }
+            else
+            {
+                workItem.UpdatedId = loggedInUserId;
+            }
+            prograsStates = await DropdownRepo.GetPrograsStatesAsync();
+
+            SetStateDetails(workItem.StateId);
+            workItemTypes = await DropdownRepo.GetWorkItemTypesAsync();
+            parentWorks = await WorkItemRepo.GetWorkItemsByProjectAsync(ProjectId);
+            employees = await EmployeeRepo.GetEmployeesOnlyAsync();
+
+            employees.Insert(0, new DbEmployee() { Id = 0, FirstName = "Unassigned" });
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+    }
+    private void OnSateChanged(int selctedId)
+    {
+        SetStateDetails(selctedId);
+    }
+
+    private void OnWorkTypeChanged(int typeId)
+    {
+        workItem.WorkTypeId = typeId;
+        isShowParent = (typeId != 1);
+        StateHasChanged();
+    }
+
+    private void SetStateDetails(int selctedId)
+    {
+        var progress = prograsStates.FirstOrDefault(x => x.Id == selctedId);
+        stateDetails = progress?.Details;
+        workItem.StateId = selctedId;
+        StateHasChanged();
+    }
+
+    private bool ValidateForm()
+    {
+        return (!string.IsNullOrEmpty(workItem.Title));
+    }
+
+    private async Task SubmitEpicForm()
+    {
+        try
+        {
+            DbWorkItem? result = new DbWorkItem();
+
+            if (!ValidateForm()) return;
+
+            workItem.Description = await this.DescriptionHtml.GetHTML();
+            workItem.AcceptanceCreteria = await this.AcceptanceCreteriaHtml.GetHTML();
+
+            if (workItem is not null && workItem.Id == 0)
+            {
+                result = await WorkItemRepo.SaveWorkItemAsync(workItem);
+            }
+            else if (workItem is not null && workItem.Id > 0)
+            {
+                result = await WorkItemRepo.UpdateWorkItemAsync(workItem);
+            }
+
+            if (result?.Id > 0)
+            {
+                await JS.InvokeVoidAsync("ShowSuccessToast", "Work has been added successfully.");
+                await OnValueChanged.InvokeAsync(result.Id);
+                await OnStateChangeEvent.InvokeAsync(result.Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("ShowErrorToast", "Something went wrong!.");
+            throw;
+        }
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,158 @@
+﻿@using KPIMS.Repos.Repositories.Board.Interfaces
+@using KPIMS.Core.Models
+@using KPIMS.Repos.Repositories.Administration.Interfaces
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
+
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject IWorkItemDiscussionRepo DiscussionRepo
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IEmployeeRepo EmployeeRepo
+
+
+@code {
+    [Parameter]
+    public int CurrentItemId { get; set; }
+    private DbWorkItemDiscussion model = new DbWorkItemDiscussion();
+    private DbEmployee? employee = new DbEmployee();
+    private string? loggedInUserId;
+
+    TextEditor CommentsHtml;
+    List<DbWorkItemDiscussion> comments = new List<DbWorkItemDiscussion>();
+
+}
+
+@if (CurrentItemId > 0)
+{
+    <div class="col-md-8 pt-3 mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <EditForm class="row g-3 needs-validation" novalidate="" Model="@model" OnValidSubmit="SubmitCommentForm">
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <div class="col-md-12">
+                                <h4>Discussion</h4>
+                                <hr />
+                                <TextEditor Toolbar="new Toolbar { ShowFullToolbar=true }"
+                                            EditorContainerId="TestId"
+                                            @ref="@CommentsHtml"
+                                            Placeholder="Enter your comments here...">
+                                </TextEditor>
+                            </div>
+                            <div class="col-md-12 mt-2">
+                                <button type="submit" class="btn btn-primary float-end">Save Comments</button>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+
+            @if (comments.Count() > 0)
+            {
+                foreach (var comment in comments)
+                {
+                    <div class="col-md-12 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="pt-3 row">
+                                    <div class="col-xl-12 col-md-12 mb-2">
+                                        <img class="tab-img img-h-30 commentor" src="@((!string.IsNullOrEmpty(comment.Employee?.Avatar))? comment.Employee?.Avatar : "images/avatar/1.png")" alt="profile">
+                                        <p class="comment-info"><strong>@comment.Employee?.FullName</strong> Commented : @comment.CreatedDate?.ToString("dd MMM yyyy")</p>
+                                    </div>
+                                    <div class="col-xl-12 col-md-12">
+                                        <div class="w-100 comment-texts">
+                                            @((MarkupString)comment.ArticleDetails)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                }
+            }
+
+
+        </div>
+    </div>
+}
+
+
+@code {
+    private int employeIdResult;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            loggedInUserId = user.FindFirst(ClaimTypes.Authentication)?.Value;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadCommentsAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task<bool> ValidateForm()
+    {
+        return (!string.IsNullOrEmpty(await this.CommentsHtml.GetHTML()));
+    }
+
+    private async Task LoadCommentsAsync()
+    {
+        int employeeID = int.Parse(loggedInUserId);
+        model.EmployeeId = employeeID;
+        comments = await DiscussionRepo.GetWorkItemDiscussionByWorkItemIdAsync(CurrentItemId);
+    }
+
+    private async Task SubmitCommentForm()
+    {
+        try
+        {
+            //await JS.InvokeVoidAsync("PostComments", "#txtArUserComments");
+
+            DbWorkItemDiscussion? result = new DbWorkItemDiscussion();
+
+            if (!await ValidateForm()) return;
+
+            model.ArticleDetails = await this.CommentsHtml.GetHTML();
+            model.WorkItemId = CurrentItemId;
+
+            if (model is not null && model.Id == 0)
+            {
+                result = await DiscussionRepo.SaveWorkItemDiscussionAsync(model);
+            }
+            else if (model is not null && model.Id > 0)
+            {
+                result = await DiscussionRepo.UpdateWorkItemDiscussionAsync(model);
+            }
+
+            if (result?.Id > 0)
+            {
+                await JS.InvokeVoidAsync("ShowSuccessToast", "Work has been added successfully.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("ShowErrorToast", "Something went wrong!.");
+            throw;
+        }
+
+        await CommentsHtml.LoadHTMLContent("");
+        await LoadCommentsAsync();
+        StateHasChanged();
+    }
+
+}

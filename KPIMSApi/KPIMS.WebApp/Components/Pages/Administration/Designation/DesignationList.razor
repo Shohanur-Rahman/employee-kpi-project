@@ -1,0 +1,154 @@
+﻿@page "/designations"
+
+ @using System.Collections.ObjectModel
+ @using KPIMS.Core.Models
+ @using KPIMS.Repos.Repositories.Administration.Interfaces
+  @using Microsoft.AspNetCore.Authorization
+
+
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject IDesignationRepo DesignationRepo
+
+@code {
+    ObservableCollection<DbDesignation> designations { get; set; }
+    DbDesignation? designation { get; set; }
+    int selectedId { get; set; }
+}
+<PageTitle>Designations</PageTitle>
+<div class="container-fluid">
+    <div class="row page-title">
+        <div class="col-sm-6">
+            <h3>Designations</h3>
+        </div>
+        <div class="col-sm-6">
+            <nav>
+                <ol class="breadcrumb justify-content-sm-end align-items-center">
+                    <li class="breadcrumb-item"><a href="">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Designations</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-header pb-0 card-no-border">
+                    <button class="btn btn-primary px-xl-2 px-xxl-3 btn-sm" type="button" @onclick="HandleAddClickEvent">
+                        <i class="fa-solid fa-plus"></i> New Designtaion
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="display" id="designationTable">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Designation</th>
+                                    <th>Position</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @{
+                                    int slCounet = 1;
+                                    if (designations is not null)
+                                    {
+                                        foreach (var item in designations)
+                                        {
+                                            <tr>
+                                                <td>@slCounet</td>
+                                                <td>@item.Name</td>
+                                                <td>@item.OrderId</td>
+                                                <td>
+                                                    <button class="btn btn-primary mb-1" @onclick="() => HandleEditClickEvent(item)"><i class="fa-solid fa-pen-to-square"></i></button>
+                                                    <button class="btn btn-danger" @onclick="() => HandleDeleteClickEvent(item)"><i class="fa-solid fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+
+                                            slCounet++;
+                                        }
+                                    }
+                                }
+
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<DesignationForm Designation="designation" ButtonClicked="LoadData" />
+<DeleteModal ButtonClicked="DeleteDesignation"/>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("LoadDataTable", "#designationTable");
+            await JS.InvokeVoidAsync("HideLoader", ".loader-wrapper");
+        }
+    }
+
+    async Task LoadData()
+    {
+        designations = new ObservableCollection<DbDesignation>(await GetDesignationsAsync());
+        StateHasChanged();
+    }
+
+    async Task<List<DbDesignation>> GetDesignationsAsync()
+    {
+        return await DesignationRepo.GetDesignationsAsync();
+    }
+
+    private async Task HandleAddClickEvent()
+    {
+        designation = new DbDesignation();
+        await OpenModal();
+        StateHasChanged();
+    }
+
+    private async Task OpenModal()
+    {
+        await Task.Delay(100);
+        await JS.InvokeVoidAsync("InitFormValidator", ".needs-validation");
+        await JS.InvokeVoidAsync("OpenModal", "#designationModal");
+    }
+
+    private async Task HandleEditClickEvent(DbDesignation roleModel)
+    {
+        designation = roleModel;
+        await OpenModal();
+        StateHasChanged();
+    }
+
+    private async Task HandleDeleteClickEvent(DbDesignation model)
+    {
+        selectedId = model.Id;
+        await JS.InvokeVoidAsync("OpenModal", "#deleteModel");
+    }
+
+    private async Task DeleteDesignation()
+    {
+        await DesignationRepo.DeleteDesignationAsync(selectedId);
+        await LoadData();
+        await JS.InvokeVoidAsync("HideModal", "#deleteModel");
+        await JS.InvokeVoidAsync("ShowSuccessToast", "Designation has been deleted successfully.");
+    }
+}

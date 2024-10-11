@@ -1,0 +1,205 @@
+﻿ @page "/edit-profile"
+
+ @using System.Collections.ObjectModel
+ @using KPIMS.Core.Models
+ @using KPIMS.Repos.Repositories.Administration.Interfaces
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
+
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject IEmployeeRepo EmployeeRepo
+@inject IEmployeeProfileRepo EmployeeProfileRepo
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@code {
+    DbEmployeeProfile? profileModel = new DbEmployeeProfile();
+    private string? userId;
+    private string? userName;
+    private string? userEmail;
+    private string? userAvatar;
+    private int loggedInUserId;
+    private EditContext editContext;
+}
+<PageTitle>Edit Profile</PageTitle>
+
+<div class="container-fluid">
+    <div class="row page-title">
+        <div class="col-sm-6">
+            <h3>Edit Profile</h3>
+        </div>
+        <div class="col-sm-6">
+            <nav>
+                <ol class="breadcrumb justify-content-sm-end align-items-center">
+                    <li class="breadcrumb-item"><a href="">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit Profile</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid edit-profile">
+    <div class="row">
+        <div class="col-xl-4">
+            <ProfileCard />
+        </div>
+        <div class="col-xl-8">
+            <EditForm class="card" novalidate="" Model="@editContext" OnValidSubmit="SubmitEmployee">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Edit Profile</h4>
+                    <div class="card-options"><a class="card-options-collapse" href="#" data-bs-toggle="card-collapse"><i class="fe fe-chevron-up"></i></a><a class="card-options-remove" href="#" data-bs-toggle="card-remove"><i class="fe fe-x"></i></a></div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-4 col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Mobile</label>
+                                <InputText class="form-control" type="text" placeholder="Secondary mobile" @bind-Value="profileModel.Mobile" />
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Personal Email</label>
+                                <InputText class="form-control" type="text" placeholder="Email" @bind-Value="profileModel.PersonalEmail" />
+                            </div>
+                        </div>
+                        <div class="col-sm-4 col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Hobby</label>
+                                <InputText class="form-control" type="text" placeholder="text" @bind-Value="profileModel.Hobby" />
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <hr />
+                        </div>
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="form-label">Present Address</label>
+                                <InputText class="form-control" type="text" placeholder="Home Address" @bind-Value="profileModel.PresentAddress" />
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label class="form-label">Permanent Address</label>
+                                <InputText class="form-control" type="text" placeholder="Permanent Address" @bind-Value="profileModel.PermanentAddress" />
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <hr />
+                        </div>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-sm-4 col-md-4">
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <InputCheckbox class="form-check-input" id="chkMaritalStatus" type="checkbox" @bind-Value="profileModel.MaritalStatus" />
+                                            <label class="form-check-label" for="chkMaritalStatus">Are you married?</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Spouse Name</label>
+                                        <InputText class="form-control" type="text" placeholder="Spouse Name" @bind-Value="profileModel.SpouseName" />
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4 col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Spouse Mobile</label>
+                                        <InputText class="form-control" type="text" placeholder="Spouse Mobile" @bind-Value="profileModel.SpouseMobile" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <hr />
+                        </div>
+                        <div class="col-sm-4 col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Emergency Contact</label>
+                                <InputText class="form-control" type="text" placeholder="Name" @bind-Value="profileModel.ContactPersionName" />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4 col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Mobile</label>
+                                <InputText class="form-control" type="text" placeholder="Mobile" @bind-Value="profileModel.ContactPersionMobile" />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4 col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <InputText class="form-control" type="text" placeholder="Email" @bind-Value="profileModel.ContactPersionEmail" />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="card-footer text-end">
+                    <button class="btn btn-primary" type="submit">Update Profile</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(ClaimTypes.Authentication)?.Value;
+            userName = user.FindFirst(ClaimTypes.Name)?.Value;
+            userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+            userAvatar = user.FindFirst(ClaimTypes.UserData)?.Value;
+            loggedInUserId = int.Parse(userId);
+        }
+
+        editContext = new EditContext(profileModel);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            profileModel = await EmployeeProfileRepo.GetEmployeeProfileByEmployeeIdAsync(loggedInUserId);
+            if (profileModel is null)
+                profileModel = new DbEmployeeProfile()
+                {
+                        EmployeeId = loggedInUserId
+                };
+
+            StateHasChanged();
+            await JS.InvokeVoidAsync("HideLoader", ".loader-wrapper");
+        }
+    }
+
+    private async Task SubmitEmployee()
+    {
+        try
+        {
+            if (profileModel is null) return;
+            var result = await EmployeeProfileRepo.SaveOrUpdateEmployeeProfileAsync(profileModel);
+            if (result?.Id > 0)
+            {
+                await JS.InvokeVoidAsync("ShowSuccessToast", "Profile has been updated successfully.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("ShowErrorToast", "Something went wrong!.");
+            throw;
+        }
+    }
+}
