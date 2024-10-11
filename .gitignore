@@ -1,0 +1,17 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/KPIMSApi/.vs/KPIMSApi/config
+/KPIMSApi/.vs/KPIMSApi
+/KPIMSApi/App.Core/bin
+/KPIMSApi/App.Core/obj
+/KPIMSApi/App.Repos/bin
+/KPIMSApi/App.Repos/obj
+/KPIMSApi/KPIMS.WebApi/.config
+/KPIMSApi/KPIMS.WebApi/bin
+/KPIMSApi/KPIMS.WebApi/obj
+/KPIMSApi/KPIMS.WebApp/.config
+/KPIMSApi/KPIMS.WebApp/bin/Debug/net8.0
+/KPIMSApi/KPIMS.WebApp/obj
+/KPIMSApi/KPIMS.WebApp/Properties
