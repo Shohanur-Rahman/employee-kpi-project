@@ -1,17 +1,21 @@
 <form>
+    <p class="text-danger mb-2 text-center">{{errorMessage}}</p>
     <div class="form-group mb-3">
         <label for="email" class="mb-2">Email address</label>
-        <input type="email" [(ngModel)]="loginModel.email" name="email" class="form-control" id="email" placeholder="Enter email" required>
+        <input type="email" [(ngModel)]="loginModel.email" name="email" class="form-control" id="email"
+            placeholder="Enter email" required>
     </div>
     <div class="form-group mb-3">
         <div class="d-flex justify-content-between align-items-center">
             <label for="password" class="mb-2">Password</label>
             <a href="#" class="forgot-password-link">Forgot Password?</a>
         </div>
-        <input type="password" [(ngModel)]="loginModel.password" name="password" class="form-control" id="password" placeholder="Password" required>
+        <input type="password" [(ngModel)]="loginModel.password" name="password" class="form-control" id="password"
+            placeholder="Password" required>
     </div>
     <div class="form-check mb-3">
-        <input [(ngModel)]="loginModel.isRemember" name="isRemember" class="form-check-input" type="checkbox" id="remember-check">
+        <input [(ngModel)]="loginModel.isRemember" name="isRemember" class="form-check-input" type="checkbox"
+            id="remember-check">
         <label class="form-check-label" for="remember-check">
             Remember me
         </label>

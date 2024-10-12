@@ -27,8 +27,9 @@
               }
             ],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "public/assets/css/bootstrap.min.css",
               "public/assets/css/icons.min.css",
+              "public/assets/css/datatables.css",
               "src/styles.css"
             ],
             "scripts": [
@@ -36,7 +37,8 @@
               "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
               "public/assets/js/metisMenu.min.js",
               "public/assets/js/simplebar.min.js",
-              "public/assets/js/waves.min.js"
+              "public/assets/js/waves.min.js",
+              "public/assets/js/jquery.datatables.min.js"
             ]
           },
           "configurations": {

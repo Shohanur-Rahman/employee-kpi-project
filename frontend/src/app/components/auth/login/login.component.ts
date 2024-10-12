@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
+import { ApiService } from '../../../../services/api.service';
 
 @Component({
   selector: 'app-login',
@@ -11,22 +13,37 @@ import { jwtDecode } from 'jwt-decode';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
+
   loginModel: any = {
     email: "",
     password: "",
     isRemember: false
   }
 
-  http = inject(HttpClient);
+  errorMessage = "";
+
+  constructor(
+    private _apiService: ApiService,
+    private _router: Router
+  ) { }
+
 
   onLogin() {
-    this.http.post(`http://gamivov425-001-site1.gtempurl.com/api/accounts/signin`, this.loginModel)
-      .subscribe((result: any) => {
-        console.log("Result => ", result)
-        if (result.succeeded) {
-          let loginInfo = jwtDecode(result.result);
-          console.log("Info => ", loginInfo)
+    this.errorMessage = "";
+    this._apiService.postData(`accounts/signin`, this.loginModel)
+      .subscribe(
+        (result: any) => {
+          if (result.succeeded) {
+            localStorage.setItem("KPIMSWebApp", result.result);
+            this._router.navigateByUrl("");
+          } else {
+            this.errorMessage = "Invalid credential!";
+          }
+        },
+        (error) => {
+          this.errorMessage = "Invalid credential!";
+          console.error("HTTP Error:", error);
         }
-      })
+      )
   }
 }

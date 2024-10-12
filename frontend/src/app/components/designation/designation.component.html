@@ -1,0 +1,67 @@
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0 font-size-18">Designations</h4>
+
+            <div class="page-title-right">
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+                    <li class="breadcrumb-item active">Designations</li>
+                </ol>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">Add Designation</h4>
+                <form>
+                    <div class="mb-3">
+                        <label for="txtName" class="form-label">Designation</label>
+                        <input type="text" class="form-control" id="txtName" placeholder="Enter designation name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="txtOrder" class="form-label">Position</label>
+                        <input type="number" class="form-control" id="txtOrder" placeholder="Enter position order">
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-primary w-md">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="display" id="designationTable">
+                        <thead>
+                            <tr>
+                                <th>SL</th>
+                                <th>Designation</th>
+                                <th>Position</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of designations; let slNo = index">
+                                <td>{{ slNo + 1 }}</td>
+                                <td>{{item.name}}</td>
+                                <td>{{item.orderId}}</td>
+                                <td>
+                                    <button class="btn btn-primary gr-btn"><i class="bx bx-edit-alt"></i></button>
+                                    <button class="btn btn-danger gr-btn"><i class="bx bx-trash-alt"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

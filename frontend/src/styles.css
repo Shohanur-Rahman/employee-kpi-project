@@ -1,3 +1,11 @@
 .w-80{
     width: 80%;
 }
+body{
+    background-color: #f8f8fb;
+}
+.gr-btn {
+    margin-right: 5px;
+    display: inline-flex;
+    padding: 5px 10px;
+}

@@ -1,10 +1,11 @@
 import { Routes } from '@angular/router';
-import { DesignationListComponent } from './components/designation/designation-list/designation-list.component';
 import { LoginComponent } from './components/auth/login/login.component';
 import { AuthLayoutComponent } from './components/auth/auth-layout/auth-layout.component';
 import { MainLayoutComponent } from './components/main-layout/main-layout.component';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { authGuard } from './guard/auth.guard';
+import { DesignationComponent } from './components/designation/designation.component';
 
 export const routes: Routes = [
     {
@@ -20,6 +21,7 @@ export const routes: Routes = [
     {
         path: '',
         component: MainLayoutComponent,
+        canActivate: [authGuard],
         children: [
             {
                 path: "",
@@ -27,7 +29,7 @@ export const routes: Routes = [
             },
             {
                 path: 'designations',
-                component: DesignationListComponent
+                component: DesignationComponent
             }
         ]
     }
