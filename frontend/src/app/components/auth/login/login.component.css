@@ -1,0 +1,39 @@
+.container-fluid {
+    height: 100vh; 
+}
+
+.row {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.login-container {
+    padding: 20px;
+}
+.bg-image {
+    background-image: url('/assets/images/bg.jpg'); 
+    background-size: cover;
+    background-position: center; 
+    background-repeat: no-repeat; 
+    height: 100vh; 
+}
+.forgot-password-link {
+    margin-left: 10px;
+    font-size: 0.9rem; 
+    color: #74788d;
+    text-decoration: none;
+}
+
+.forgot-password-link:hover {
+    text-decoration: none;
+    color: #007bff;
+}
+
+@media (max-width: 767.98px) {
+    .login-form {
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
