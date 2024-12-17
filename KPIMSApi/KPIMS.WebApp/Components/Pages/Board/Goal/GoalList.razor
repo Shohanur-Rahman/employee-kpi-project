@@ -1,0 +1,129 @@
+﻿@page "/goals"
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using KPIMS.Repos.Repositories.Board.Interfaces
+@using KPIMS.Core.Models
+
+
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IGoalSetRepo GoalSetRepo
+@inject IJSRuntime JS
+
+@code {
+    private string? userId;
+    private string? userName;
+    private string? userEmail;
+    private string? userAvatar;
+    private int loggedInUserId;
+
+    private List<GoalSet> goalList = new List<GoalSet>();
+}
+<PageTitle>Goals</PageTitle>
+<div class="container-fluid">
+    <div class="row page-title">
+        <div class="col-sm-6">
+            <h3>My Goals</h3>
+        </div>
+        <div class="col-sm-6">
+            <nav>
+                <ol class="breadcrumb justify-content-sm-end align-items-center">
+                    <li class="breadcrumb-item"><a href="">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/projects">Goals</a></li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-sm-12">
+            <p>All goals for @userName</p>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header pb-0 card-no-border">
+                    <a class="btn btn-primary px-xl-2 px-xxl-3 btn-sm" type="button" href="goals/add-goal">
+                        <i class="fa-solid fa-plus"></i> New Goal
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>SL.</th>
+                                    <th>Overview</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Approved</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (goalList.Any())
+                                {
+                                    int counter = 1;
+                                    foreach (var goal in goalList)
+                                    {
+
+                                        <tr>
+                                            <td>@counter</td>
+                                            <td>@goal.GoalOverview</td>
+                                            <td>@goal.StartDate?.ToString("dd MM yyyy")</td>
+                                            <td>@goal.EndDate?.ToString("dd MM yyyy")</td>
+                                            <td>@(goal.ApproverId > 0? "Yes": "No")</td>
+                                            <td>
+                                                @if (goal.ApproverId <= 0){
+                                                    <a class="btn btn-primary mb-1" href="/goals/edit-goal/@goal.Id"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                }
+                                            </td>
+                                        </tr>
+
+                                        counter++;
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(ClaimTypes.Authentication)?.Value;
+            userName = user.FindFirst(ClaimTypes.Name)?.Value;
+            userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+            userAvatar = user.FindFirst(ClaimTypes.UserData)?.Value;
+            loggedInUserId = int.Parse(userId);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadData();
+            await JS.InvokeVoidAsync("HideLoader", ".loader-wrapper");
+        }
+    }
+
+    private async Task LoadData()
+    {
+        goalList = await GoalSetRepo.GetGoalSetsByUserIdAsync(loggedInUserId);
+        StateHasChanged();
+    }
+}

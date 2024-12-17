@@ -1,25 +1,70 @@
-﻿<div class="card">
+﻿ @using KPIMS.Repos.Repositories.Common.Interfaces;
+ @using KPIMS.Core.Models;
+
+ @rendermode InteractiveServer
+
+  @inject IDropdownRepo DropdownRepo
+
+@code {
+    private List<DbKpiIndicator> kpiIndicators = new List<DbKpiIndicator>();
+  }
+
+<div class="card  w-100">
     <div class="card-header pb-0">
-        <h4>Default lists</h4>
+        <h4>KPI Chart</h4>
     </div>
     <div class="card-body">
-        <ol class="list-group list-group-numbered badge-list">
-            <li class="list-group-item">
-                <div>Stella Nowland</div><span class="badge badge-warning rounded-pill p-2">Freelance</span>
-            </li>
-            <li class="list-group-item">
-                <div>Lola Stanford</div><span class="badge badge-danger text-white rounded-pill p-2">Issue</span>
-            </li>
-            <li class="list-group-item">
-                <div>Caitlin Coungeau</div><span class="badge badge-primary text-white rounded-pill p-2">Social</span>
-            </li>
-            <li class="list-group-item">
-                <div>Graciela W. McClaran</div><span class="badge badge-danger text-white rounded-pill p-2">Issue</span>
-            </li>
-        </ol>
+        <div class="table-responsive">
+            <table class="table kpi-table">
+                <thead>
+                    <tr>
+                        <th>Label</th>
+                        <th>Point</th>
+                        <th>Benefit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (kpiIndicators.Any())
+                    {
+                        foreach (var item in kpiIndicators)
+                        {
+                            <tr>
+                                <td>@item.KPILabel</td>
+                                <td>@item.MinPoint - @item.MaxPoint</td>
+                                @if(item.Id == 1){
+                                    <td align="center"><span class="badge badge-danger text-white rounded-pill p-2">@item.PerofrmanceBenefit</span></td>
+                                }else if(item.Id == 5){
+                                    <td align="center"><span class="badge badge-primary text-white rounded-pill p-2">@item.PerofrmanceBenefit</span></td>
+                                }
+                                else if (item.Id == 6)
+                                {
+                                    <td align="center"><span class="badge badge-success text-white rounded-pill p-2">@item.PerofrmanceBenefit</span></td>
+                                }
+                                else
+                                {
+                                    <td align="center">@item.PerofrmanceBenefit</td>
+                                }
+                              
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 @code {
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        kpiIndicators = await DropdownRepo.GetKpiIndicatorsAsync();
+        StateHasChanged();
+    }
 }

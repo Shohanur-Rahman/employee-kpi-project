@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace KPIMS.Repos.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class initialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -284,22 +284,22 @@ namespace KPIMS.Repos.Migrations
                 columns: new[] { "Id", "CreatedDate", "CreatedId", "IsDeleted", "Name", "OrderId", "UpdatedDate", "UpdatedId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8468), 0, false, "System Administrator", 1, null, 0 },
-                    { 2, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8472), 0, false, "Managing Director", 2, null, 0 },
-                    { 3, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8473), 0, false, "Deputy Managing Director", 3, null, 0 },
-                    { 4, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8475), 0, false, "General Manager", 4, null, 0 },
-                    { 5, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8476), 0, false, "Deputy General Manager", 5, null, 0 },
-                    { 6, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8477), 0, false, "Director", 6, null, 0 },
-                    { 7, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8479), 0, false, "Department Manager/Tech Lead\r\n", 7, null, 0 },
-                    { 8, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8480), 0, false, "Assistant Manager", 8, null, 0 },
-                    { 9, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8481), 0, false, "Senior Team Leaders", 9, null, 0 },
-                    { 10, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8482), 0, false, "Team Leaders/Lead Developer", 10, null, 0 },
-                    { 11, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8484), 0, false, "Assistant Team Leaders/Senior Software Engineer", 11, null, 0 },
-                    { 12, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8485), 0, false, "Quality Assurance Specialist", 12, null, 0 },
-                    { 13, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8486), 0, false, "Senior Executive Officer/ Software Engineer", 13, null, 0 },
-                    { 14, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8488), 0, false, "Executives Officer/ Associate Software Engineer", 14, null, 0 },
-                    { 15, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8489), 0, false, "Associate Executive Officer", 15, null, 0 },
-                    { 16, new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8490), 0, false, "Trainee Executive Officer", 16, null, 0 }
+                    { 1, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2164), 0, false, "System Administrator", 1, null, 0 },
+                    { 2, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2172), 0, false, "Managing Director", 2, null, 0 },
+                    { 3, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2174), 0, false, "Deputy Managing Director", 3, null, 0 },
+                    { 4, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2175), 0, false, "General Manager", 4, null, 0 },
+                    { 5, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2177), 0, false, "Deputy General Manager", 5, null, 0 },
+                    { 6, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2178), 0, false, "Director", 6, null, 0 },
+                    { 7, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2180), 0, false, "Department Manager/Tech Lead\r\n", 7, null, 0 },
+                    { 8, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2181), 0, false, "Assistant Manager", 8, null, 0 },
+                    { 9, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2182), 0, false, "Senior Team Leaders", 9, null, 0 },
+                    { 10, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2184), 0, false, "Team Leaders/Lead Developer", 10, null, 0 },
+                    { 11, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2253), 0, false, "Assistant Team Leaders/Senior Software Engineer", 11, null, 0 },
+                    { 12, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2254), 0, false, "Quality Assurance Specialist", 12, null, 0 },
+                    { 13, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2256), 0, false, "Senior Executive Officer/ Software Engineer", 13, null, 0 },
+                    { 14, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2257), 0, false, "Executives Officer/ Associate Software Engineer", 14, null, 0 },
+                    { 15, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2259), 0, false, "Associate Executive Officer", 15, null, 0 },
+                    { 16, new DateTime(2024, 12, 17, 8, 52, 49, 482, DateTimeKind.Local).AddTicks(2260), 0, false, "Trainee Executive Officer", 16, null, 0 }
                 });
 
             migrationBuilder.InsertData(
@@ -333,9 +333,9 @@ namespace KPIMS.Repos.Migrations
                 columns: new[] { "Id", "Avatar", "CreatedDate", "CreatedId", "DesignationId", "Email", "FirstName", "IsDeleted", "LastName", "Mobile", "Password", "PasswordSalt", "UpdatedDate", "UpdatedId" },
                 values: new object[,]
                 {
-                    { 1, "images/avatar/1.png", new DateTime(2024, 10, 1, 13, 19, 22, 580, DateTimeKind.Local).AddTicks(2156), 0, 1, "rima@gmail.com", "Rima", false, "Akter", "", "R+XEf/rn63fJ217p/NK6vHDLAoH3GuPHw0XkW6uj4dU=", "kd0YYkhDDNB37GbBPmwn8w==", null, 0 },
-                    { 2, "images/avatar/1.png", new DateTime(2024, 10, 1, 13, 19, 22, 580, DateTimeKind.Local).AddTicks(2164), 0, 1, "admin@gmail.com", "System", false, "Admin", "", "R+XEf/rn63fJ217p/NK6vHDLAoH3GuPHw0XkW6uj4dU=", "kd0YYkhDDNB37GbBPmwn8w==", null, 0 },
-                    { 3, "images/avatar/1.png", new DateTime(2024, 10, 1, 13, 19, 22, 580, DateTimeKind.Local).AddTicks(2167), 0, 1, "it-admin@gmail.com", "IT", false, "Admin", "", "R+XEf/rn63fJ217p/NK6vHDLAoH3GuPHw0XkW6uj4dU=", "kd0YYkhDDNB37GbBPmwn8w==", null, 0 }
+                    { 1, "images/avatar/1.png", new DateTime(2024, 12, 17, 8, 52, 49, 503, DateTimeKind.Local).AddTicks(4363), 0, 1, "rima@gmail.com", "Rima", false, "Akter", "", "6bHhvBZ9AChTCm+XHMFunAktGiPgjb3s2FuDx226Q24=", "C2Iq8qtSwij/hYghE5LkwQ==", null, 0 },
+                    { 2, "images/avatar/1.png", new DateTime(2024, 12, 17, 8, 52, 49, 503, DateTimeKind.Local).AddTicks(4377), 0, 1, "admin@gmail.com", "System", false, "Admin", "", "6bHhvBZ9AChTCm+XHMFunAktGiPgjb3s2FuDx226Q24=", "C2Iq8qtSwij/hYghE5LkwQ==", null, 0 },
+                    { 3, "images/avatar/1.png", new DateTime(2024, 12, 17, 8, 52, 49, 503, DateTimeKind.Local).AddTicks(4381), 0, 1, "it-admin@gmail.com", "IT", false, "Admin", "", "6bHhvBZ9AChTCm+XHMFunAktGiPgjb3s2FuDx226Q24=", "C2Iq8qtSwij/hYghE5LkwQ==", null, 0 }
                 });
 
             migrationBuilder.CreateIndex(

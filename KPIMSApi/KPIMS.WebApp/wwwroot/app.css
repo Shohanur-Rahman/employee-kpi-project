@@ -97,3 +97,7 @@ img.user-avatar {
     float: left;
     margin-right: 10px;
 }
+
+.kpi-table td{
+    padding: 5px 10px !important;
+}

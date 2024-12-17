@@ -9,6 +9,9 @@ namespace KPIMS.Repos.Repositories.Board.Interfaces
         Task<List<DbWorkItemLog>> GetWorkImteChangeLogAsync(int workItemId);
         Task<List<DbWorkItem>> GetWorkItemsByTypeAsync(WorksType typeId, int projectId);
         Task<List<DbWorkItem>> GetWorkItemsByProjectAsync(int projectId);
+        Task<List<DbWorkItem>> GetWorkItemsByAssignedIdAsync(int assignedId);
+        Task<List<DbWorkItem>> GetWorkItemsByAssignedIdAsync(int assignedId, WorksType typeId);
+        Task<List<DbWorkItem>> GetWorkItemsByAssignedIdAsync(int assignedId, WorksType typeId, int stateId);
         Task<DbWorkItem?> GetWorkItemByIdAsync(int id);
         Task<DbWorkItem> SaveWorkItemAsync(DbWorkItem model);
         Task<DbWorkItem?> UpdateWorkItemAsync(DbWorkItem model);

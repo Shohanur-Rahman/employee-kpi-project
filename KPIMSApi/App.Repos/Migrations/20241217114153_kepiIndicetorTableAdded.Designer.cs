@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KPIMS.Repos.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241001071923_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20241217114153_kepiIndicetorTableAdded")]
+    partial class kepiIndicetorTableAdded
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -63,7 +63,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8468),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8729),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "System Administrator",
@@ -73,7 +73,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8472),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8732),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Managing Director",
@@ -83,7 +83,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8473),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8733),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Deputy Managing Director",
@@ -93,7 +93,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 4,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8475),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8735),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "General Manager",
@@ -103,7 +103,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 5,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8476),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8736),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Deputy General Manager",
@@ -113,7 +113,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 6,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8477),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8737),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Director",
@@ -123,7 +123,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 7,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8479),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8739),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Department Manager/Tech Lead\r\n",
@@ -133,7 +133,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 8,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8480),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8740),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Assistant Manager",
@@ -143,7 +143,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 9,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8481),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8741),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Senior Team Leaders",
@@ -153,7 +153,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 10,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8482),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8742),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Team Leaders/Lead Developer",
@@ -163,7 +163,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 11,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8484),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8743),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Assistant Team Leaders/Senior Software Engineer",
@@ -173,7 +173,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 12,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8485),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8744),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Quality Assurance Specialist",
@@ -183,7 +183,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 13,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8486),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8745),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Senior Executive Officer/ Software Engineer",
@@ -193,7 +193,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 14,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8488),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8747),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Executives Officer/ Associate Software Engineer",
@@ -203,7 +203,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 15,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8489),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8748),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Associate Executive Officer",
@@ -213,7 +213,7 @@ namespace KPIMS.Repos.Migrations
                         new
                         {
                             Id = 16,
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 564, DateTimeKind.Local).AddTicks(8490),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 968, DateTimeKind.Local).AddTicks(8749),
                             CreatedId = 0,
                             IsDeleted = false,
                             Name = "Trainee Executive Officer",
@@ -289,7 +289,7 @@ namespace KPIMS.Repos.Migrations
                         {
                             Id = 1,
                             Avatar = "images/avatar/1.png",
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 580, DateTimeKind.Local).AddTicks(2156),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 982, DateTimeKind.Local).AddTicks(2906),
                             CreatedId = 0,
                             DesignationId = 1,
                             Email = "rima@gmail.com",
@@ -297,15 +297,15 @@ namespace KPIMS.Repos.Migrations
                             IsDeleted = false,
                             LastName = "Akter",
                             Mobile = "",
-                            Password = "R+XEf/rn63fJ217p/NK6vHDLAoH3GuPHw0XkW6uj4dU=",
-                            PasswordSalt = "kd0YYkhDDNB37GbBPmwn8w==",
+                            Password = "3rr96JMdTcjHGBbIdyyFk+7rT7jvd7Euee1Bzmm7qTk=",
+                            PasswordSalt = "C9urdtgyvENaKPSmniF+Zg==",
                             UpdatedId = 0
                         },
                         new
                         {
                             Id = 2,
                             Avatar = "images/avatar/1.png",
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 580, DateTimeKind.Local).AddTicks(2164),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 982, DateTimeKind.Local).AddTicks(2914),
                             CreatedId = 0,
                             DesignationId = 1,
                             Email = "admin@gmail.com",
@@ -313,15 +313,15 @@ namespace KPIMS.Repos.Migrations
                             IsDeleted = false,
                             LastName = "Admin",
                             Mobile = "",
-                            Password = "R+XEf/rn63fJ217p/NK6vHDLAoH3GuPHw0XkW6uj4dU=",
-                            PasswordSalt = "kd0YYkhDDNB37GbBPmwn8w==",
+                            Password = "3rr96JMdTcjHGBbIdyyFk+7rT7jvd7Euee1Bzmm7qTk=",
+                            PasswordSalt = "C9urdtgyvENaKPSmniF+Zg==",
                             UpdatedId = 0
                         },
                         new
                         {
                             Id = 3,
                             Avatar = "images/avatar/1.png",
-                            CreatedDate = new DateTime(2024, 10, 1, 13, 19, 22, 580, DateTimeKind.Local).AddTicks(2167),
+                            CreatedDate = new DateTime(2024, 12, 17, 17, 41, 52, 982, DateTimeKind.Local).AddTicks(2917),
                             CreatedId = 0,
                             DesignationId = 1,
                             Email = "it-admin@gmail.com",
@@ -329,8 +329,8 @@ namespace KPIMS.Repos.Migrations
                             IsDeleted = false,
                             LastName = "Admin",
                             Mobile = "",
-                            Password = "R+XEf/rn63fJ217p/NK6vHDLAoH3GuPHw0XkW6uj4dU=",
-                            PasswordSalt = "kd0YYkhDDNB37GbBPmwn8w==",
+                            Password = "3rr96JMdTcjHGBbIdyyFk+7rT7jvd7Euee1Bzmm7qTk=",
+                            PasswordSalt = "C9urdtgyvENaKPSmniF+Zg==",
                             UpdatedId = 0
                         });
                 });
@@ -400,6 +400,83 @@ namespace KPIMS.Repos.Migrations
                         .IsUnique();
 
                     b.ToTable("EmployeeProfiles");
+                });
+
+            modelBuilder.Entity("KPIMS.Core.Models.DbKpiIndicator", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("KPILabel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaxPoint")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinPoint")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PerofrmanceBenefit")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KpiIndicators");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            KPILabel = "Nothing satisfactory has been done",
+                            MaxPoint = 50,
+                            MinPoint = 0,
+                            PerofrmanceBenefit = "(0%) Take care yourself"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            KPILabel = "Performane bellow average",
+                            MaxPoint = 60,
+                            MinPoint = 51,
+                            PerofrmanceBenefit = "2% - 4%"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            KPILabel = "Average perofrmance",
+                            MaxPoint = 70,
+                            MinPoint = 61,
+                            PerofrmanceBenefit = "5% - 8%"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            KPILabel = "Performance above average",
+                            MaxPoint = 80,
+                            MinPoint = 71,
+                            PerofrmanceBenefit = "9% - 12%"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            KPILabel = "Good performer",
+                            MaxPoint = 90,
+                            MinPoint = 81,
+                            PerofrmanceBenefit = "13% - 15%"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            KPILabel = "Best performer",
+                            MaxPoint = 100,
+                            MinPoint = 90,
+                            PerofrmanceBenefit = "16% - 20%"
+                        });
                 });
 
             modelBuilder.Entity("KPIMS.Core.Models.DbPrograsState", b =>
@@ -742,6 +819,55 @@ namespace KPIMS.Repos.Migrations
                             Id = 6,
                             Title = "Task"
                         });
+                });
+
+            modelBuilder.Entity("KPIMS.Core.Models.GoalSet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ApproverId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GoalOverview")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("KeyPoints")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UpdatedId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GoalSets");
                 });
 
             modelBuilder.Entity("KPIMS.Core.Models.DbEmployee", b =>

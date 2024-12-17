@@ -6,5 +6,6 @@ namespace KPIMS.Repos.Repositories.Common.Interfaces
     {
         Task<List<DbPrograsState>> GetPrograsStatesAsync();
         Task<List<DbWorkItemType>> GetWorkItemTypesAsync();
+        Task<List<DbKpiIndicator>> GetKpiIndicatorsAsync();
     }
 }

@@ -1,44 +1,85 @@
-﻿<div class="card project-card">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@using KPIMS.Core.Models
+@using KPIMS.Repos.Repositories.Board.Interfaces
+@using KPIMS.Core.Utilities
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IWorkItemRepo WorkItemRepo
+
+
+@code {
+    private string? userId;
+    private string? userName;
+    private string? userEmail;
+    private string? userAvatar;
+    private int loggedInUserId;
+    List<DbWorkItem> activeWorkItems = new List<DbWorkItem>();
+}
+
+<div class="card project-card w-100">
     <div class="card-header">
-        <h4>Project Overview</h4>
+        <h4>My Active Works</h4>
     </div>
     <div class="card-body pt-0">
-        <h4>56<span class="ms-1">Project</span></h4>
         <div class="row align-items-center">
-            <div class="col-5 custom-width">
-                <div class="progress progress-striped-primary">
-                    <div class="progress-bar" style="width: 55%" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="progress progress-striped-secondary">
-                    <div class="progress-bar" style="width: 60%" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                <div class="progress progress-striped-tertiary">
-                    <div class="progress-bar" style="width: 45%" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-            </div>
-            <div class="col-7 d-sm-none d-md-block">
-                <ul class="overview-details">
-                    <li class="d-flex align-items-center">
-                        <div class="circle-dot-primary"><span></span></div>
-                        <h5>15<span class="font-light ms-1">Signed</span></h5>
-                    </li>
-                    <li class="d-flex align-items-center">
-                        <div class="circle-dot-secondary"><span></span></div>
-                        <h5>62<span class="font-light ms-1">Manager Review</span></h5>
-                    </li>
-                    <li class="d-flex align-items-center">
-                        <div class="circle-dot-tertiary"><span></span></div>
-                        <h5>20<span class="font-light ms-1">Client Review</span></h5>
-                    </li>
-                </ul>
+            <div class="table-responsive">
+                <table class="table kpi-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Point</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (activeWorkItems.Any()){
+                            foreach (var item in activeWorkItems){
+                                <tr>
+                                    <td><a href="projects/@item.ProjectId/workitems/edit-workitem/@item.Id?type=@item.WorkTypeId&token=@Guid.NewGuid().ToString()">@item.Title</a></td>
+                                    <td>@item.StartDate?.ToString("dd MMM yyyy")</td>
+                                    <td>@item.EndDate?.ToString("dd MMM yyyy")</td>
+                                    <td align="center">@item.StoryPoint</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
-        <a class="view-btn btn btn-secondary d-block w-100 position-relative" href="">
-            View projects
-        </a>
     </div>
 </div>
 
 @code {
 
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(ClaimTypes.Authentication)?.Value;
+            userName = user.FindFirst(ClaimTypes.Name)?.Value;
+            userEmail = user.FindFirst(ClaimTypes.Authentication)?.Value;
+            userAvatar = user.FindFirst(ClaimTypes.UserData)?.Value;
+            loggedInUserId = int.Parse(userId);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadData();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        activeWorkItems = await WorkItemRepo.GetWorkItemsByAssignedIdAsync(loggedInUserId, WorksType.UserStory, 2);
+        StateHasChanged();
+    }
 }

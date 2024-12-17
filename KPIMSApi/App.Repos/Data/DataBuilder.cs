@@ -28,12 +28,65 @@ namespace KPIMS.Repos.Data
             this.SetupPrograsStateData();
             this.SetupRoleData();
             this.SetupEmployeeData();
+            this.SetupKpiIndicatorData();
         }
 
         #endregion
 
 
-        
+        private void SetupKpiIndicatorData()
+        {
+            this.modelBuilder.Entity<DbKpiIndicator>().HasData(
+                new DbKpiIndicator
+                {
+                    Id = 1,
+                    KPILabel = "Nothing satisfactory has been done",
+                    MinPoint = 0,
+                    MaxPoint = 50,
+                    PerofrmanceBenefit="(0%) Take care yourself"
+                },
+                new DbKpiIndicator
+                {
+                    Id = 2,
+                    KPILabel = "Performane bellow average",
+                    MinPoint = 51,
+                    MaxPoint = 60,
+                    PerofrmanceBenefit = "2% - 4%"
+                },
+                new DbKpiIndicator
+                {
+                    Id = 3,
+                    KPILabel = "Average perofrmance",
+                    MinPoint = 61,
+                    MaxPoint = 70,
+                    PerofrmanceBenefit = "5% - 8%"
+                },
+                new DbKpiIndicator
+                {
+                    Id = 4,
+                    KPILabel = "Performance above average",
+                    MinPoint = 71,
+                    MaxPoint = 80,
+                    PerofrmanceBenefit = "9% - 12%"
+                },
+                new DbKpiIndicator
+                {
+                    Id = 5,
+                    KPILabel = "Good performer",
+                    MinPoint = 81,
+                    MaxPoint = 90,
+                    PerofrmanceBenefit = "13% - 15%"
+                },
+                new DbKpiIndicator
+                {
+                    Id = 6,
+                    KPILabel = "Best performer",
+                    MinPoint = 90,
+                    MaxPoint = 100,
+                    PerofrmanceBenefit = "16% - 20%"
+                }
+            );
+        }
         private void SetupWorkItemData()
         {
             this.modelBuilder.Entity<DbWorkItemType>().HasData(

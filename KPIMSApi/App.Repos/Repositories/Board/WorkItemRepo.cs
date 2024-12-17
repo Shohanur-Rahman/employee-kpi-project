@@ -39,6 +39,20 @@ namespace KPIMS.Repos.Repositories.Board
             return await _appDbContext.WorkItems.Where(x => x.ProjectId == projectId && !x.IsDeleted).AsNoTracking().OrderByDescending(x => x.Id).ToListAsync();
         }
 
+        public async Task<List<DbWorkItem>> GetWorkItemsByAssignedIdAsync(int assignedId, WorksType typeId, int stateId)
+        {
+            return await _appDbContext.WorkItems.Where(x => x.AssignedToId == assignedId && x.StateId == stateId && !x.IsDeleted && x.WorkTypeId == (int)typeId).AsNoTracking().OrderByDescending(x => x.Id).ToListAsync();
+        }
+
+        public async Task<List<DbWorkItem>> GetWorkItemsByAssignedIdAsync(int assignedId, WorksType typeId)
+        {
+            return await _appDbContext.WorkItems.Where(x => x.AssignedToId == assignedId && !x.IsDeleted && x.WorkTypeId == (int)typeId).AsNoTracking().OrderByDescending(x => x.Id).ToListAsync();
+        }
+        public async Task<List<DbWorkItem>> GetWorkItemsByAssignedIdAsync(int assignedId)
+        {
+            return await _appDbContext.WorkItems.Where(x => x.AssignedToId == assignedId && !x.IsDeleted).AsNoTracking().OrderByDescending(x => x.Id).ToListAsync();
+        }
+
         public async Task<DbWorkItem?> GetWorkItemByIdAsync(int id)
         {
             return await _appDbContext.WorkItems.AsNoTracking().SingleOrDefaultAsync(x => !x.IsDeleted && x.Id == id);

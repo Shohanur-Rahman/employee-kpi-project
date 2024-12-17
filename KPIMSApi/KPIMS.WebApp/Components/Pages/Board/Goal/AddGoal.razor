@@ -1,0 +1,150 @@
+﻿ @page "/goals/add-goal"
+
+ @using System.Collections.ObjectModel
+ @using KPIMS.Core.Models
+ @using KPIMS.Repos.Repositories.Administration.Interfaces
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using KPIMS.Repos.Repositories.Board.Interfaces
+
+
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IGoalSetRepo GoalSetRepo
+@inject NavigationManager Navigation
+
+@code {
+    public GoalSet goal = new GoalSet();
+    private EditContext editContext;
+    private string OverviewText { get; set; } = string.Empty;
+
+    private string? userId;
+    private string? userName;
+    private string? userEmail;
+    private string? userAvatar;
+    private int loggedInUserId;
+
+    TextEditor DescriptionHtml;
+    TextEditor KeyPointsHtml;
+}
+<PageTitle>Edit Profile</PageTitle>
+
+<div class="container-fluid">
+    <div class="row page-title">
+        <div class="col-sm-6">
+            <h3>Add Goal</h3>
+        </div>
+        <div class="col-sm-6">
+            <nav>
+                <ol class="breadcrumb justify-content-sm-end align-items-center">
+                    <li class="breadcrumb-item"><a href="">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/goals">Goals</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Add Goal</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid edit-profile">
+    <div class="row">
+
+        <EditForm class="card" novalidate="" Model="@editContext" OnValidSubmit="SubmitGoal">
+            <div class="col-xl-12">
+                <div class="mb-3">
+                    <label class="form-label">Overview</label>
+                    <InputText class="form-control" type="text" placeholder="Secondary mobile" @bind-Value="goal.GoalOverview" />
+                </div>
+            </div>
+            <div class="col-xl-12">
+                <div class="row mb-3">
+                    <div class="col-md-6 pt-3">
+                        <label class="form-label" for="txtStartDate">Start Date</label>
+                        <InputDate class="form-control" @bind-Value="goal.StartDate" id="txtStartDate" />
+                    </div>
+                    <div class="col-md-6 pt-3">
+                        <label class="form-label" for="txtStartDate">End Date</label>
+                        <InputDate class="form-control" @bind-Value="goal.EndDate" id="txtStartDate" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-12">
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <TextEditor Toolbar="new Toolbar { ShowFullToolbar=true }" EditorContainerId="TestId" @ref="@DescriptionHtml"
+                                Placeholder="Enter non HTML format like centering...">
+                    </TextEditor>
+                </div>
+            </div>
+
+            <div class="col-xl-12">
+                <div class="mb-3">
+                    <label class="form-label">Key Points</label>
+                    <TextEditor Toolbar="new Toolbar { ShowFullToolbar=true }" EditorContainerId="TestId" @ref="@KeyPointsHtml"
+                                Placeholder="Enter non HTML format like centering...">
+                    </TextEditor>
+                </div>
+            </div>
+            <div class="card-footer text-end">
+                <button class="btn btn-primary" type="submit">Save Goal</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+     @code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(ClaimTypes.Authentication)?.Value;
+            userName = user.FindFirst(ClaimTypes.Name)?.Value;
+            userEmail = user.FindFirst(ClaimTypes.Email)?.Value;
+            userAvatar = user.FindFirst(ClaimTypes.UserData)?.Value;
+            loggedInUserId = int.Parse(userId);
+        }
+
+        editContext = new EditContext(goal);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            StateHasChanged();
+            await JS.InvokeVoidAsync("HideLoader", ".loader-wrapper");
+        }
+    }
+
+    private async Task SubmitGoal()
+    {
+        try
+        {
+            if (goal is null) return;
+
+            goal.Description = await this.DescriptionHtml.GetHTML();
+            goal.KeyPoints = await this.KeyPointsHtml.GetHTML();
+            goal.CreatedId = loggedInUserId;
+            goal.CreatedDate = DateTime.Now;
+            var result = await GoalSetRepo.SaveGoalSetAsync(goal);
+            if (result?.Id > 0)
+            {
+                await JS.InvokeVoidAsync("ShowSuccessToast", "Goal has been added successfully.");
+            }
+            await Task.Delay(500);
+            Navigation.NavigateTo("/goals");
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("ShowErrorToast", "Something went wrong!.");
+            throw;
+        }
+    }
+}

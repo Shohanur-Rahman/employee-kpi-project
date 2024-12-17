@@ -44,5 +44,7 @@ namespace KPIMS.Repos
         public virtual DbSet<DbWorkItem> WorkItems { get; set; }
         public virtual DbSet<DbWorkItemLog> WorkItemLogs { get; set; }
         public virtual DbSet<DbWorkItemDiscussion> WorkItemDiscussions { get; set; }
+        public virtual DbSet<GoalSet> GoalSets { get; set; }
+        public virtual DbSet<DbKpiIndicator> KpiIndicators { get; set; }
     }
 }

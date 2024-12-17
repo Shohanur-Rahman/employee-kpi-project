@@ -20,6 +20,7 @@ namespace KPIMS.Repos.Configuration
             services.AddTransient<IDropdownRepo, DropdownRepo>();
             services.AddTransient<IWorkItemRepo, WorkItemRepo>();
             services.AddTransient<IWorkItemDiscussionRepo, WorkItemDiscussionRepo>();
+            services.AddTransient<IGoalSetRepo, GoalSetRepo>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             return services;

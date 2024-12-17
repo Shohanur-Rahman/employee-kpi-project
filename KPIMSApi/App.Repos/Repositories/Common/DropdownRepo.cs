@@ -25,5 +25,10 @@ namespace KPIMS.Repos.Repositories.Common
         {
             return await _appDbContext.WorkItemTypes.AsNoTracking().OrderBy(x => x.Id).ToListAsync();
         }
+
+        public async Task<List<DbKpiIndicator>> GetKpiIndicatorsAsync()
+        {
+            return await _appDbContext.KpiIndicators.AsNoTracking().OrderByDescending(x => x.Id).ToListAsync();
+        }
     }
 }
